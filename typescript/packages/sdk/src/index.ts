@@ -18,3 +18,4 @@ export class ArkheClient {
     }) as Promise<ERC8257Tool>;
   }
 }
+export * from './agentfield_bridge';
