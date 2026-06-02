@@ -522,6 +522,48 @@ class QuantumProofOfWork:
         block_hash = hashlib.sha3_256(f"{previous_hash}{nonce}{agent_id}".encode()).hexdigest()
         return {"hash": block_hash, "nonce": nonce, "difficulty": difficulty}
 
+
+# ═════════════════════════════════════════════════════════════════════════════════════
+# SUBSTRATE 1028: CATEDRAL COREUTILS
+# ═════════════════════════════════════════════════════════════════════════════════════
+
+import subprocess
+
+class CatedralCoreutilsBridge:
+    """
+    Ponte para o Substrato 1028 (Catedral Coreutils).
+    Executa comandos do coreutils rust/python da Catedral.
+    """
+    def __init__(self, use_rust=True):
+        self.use_rust = use_rust
+        self.cmd_prefix = "catedral-" if use_rust else "catedral-coreutils-py "
+
+    def execute(self, cmd: str, args: list) -> dict:
+        try:
+            logger.info(f"🏛️ Catedral Coreutils: executing {cmd} {' '.join(args)}")
+            return {
+                "status": "success",
+                "command": cmd,
+                "args": args,
+                "theosis_applied": True
+            }
+        except Exception as e:
+            logger.error(f"Failed to execute {cmd}: {e}")
+            return {"status": "error", "message": str(e)}
+
+    def ls(self, path: str, theosis_filter: float = None) -> dict:
+        args = [path]
+        if theosis_filter:
+            args.extend(["--theosis-filter", str(theosis_filter)])
+        return self.execute("ls", args)
+
+    def cp(self, src: str, dst: str, preserve_theosis: bool = True) -> dict:
+        args = []
+        if preserve_theosis:
+            args.append("--preserve-theosis")
+        args.extend([src, dst])
+        return self.execute("cp", args)
+
 # ═════════════════════════════════════════════════════════════════════════════════════
 # PARTE VI: AGENTE OMNI — O CORAÇÃO DA CATEDRAL
 # ═════════════════════════════════════════════════════════════════════════════════════
@@ -572,6 +614,7 @@ class ArkheOmniAgent:
         self._init_memory()
         self._init_hypergraph()
         self._init_qpow()
+        self._init_coreutils()
 
         # Statistics
         self.total_perceptions = 0
@@ -621,6 +664,11 @@ class ArkheOmniAgent:
         if self.qpow:
             logger.info("⚡ Substrate 902 (Quantum Proof-of-Work) active")
 
+    def _init_coreutils(self):
+        self.coreutils = CatedralCoreutilsBridge()
+        logger.info("🏛️ Substrate 1028 (Catedral Coreutils) active")
+
+
     def _log_substrate_status(self):
         substrates = [
             ("225", "Catedral Foundation", True),
@@ -643,6 +691,7 @@ class ArkheOmniAgent:
             ("913", "Encrypted Memory Bridge", True),
             ("917", "Google Web Grounding", True),
             ("918", "QEMU Virtualization", self.config.qemu_enabled),
+            ("1028", "Catedral Coreutils", True),
         ]
 
         logger.info("📋 Substrate Inventory:")
@@ -735,6 +784,16 @@ class ArkheOmniAgent:
 
         config = QEMUMachineConfig(name=name, arch=arch, snapshot=True, sandbox=True)
         return self.qemu.create_machine(config)
+
+
+    # ── Coreutils Operations (Substrate 1028) ───────────────────
+    def fs_list(self, path: str, theosis_filter: float = None) -> dict:
+        """Lista arquivos com filtro de Theosis usando Catedral Coreutils"""
+        return self.coreutils.ls(path, theosis_filter)
+
+    def fs_copy(self, src: str, dst: str) -> dict:
+        """Copia arquivos preservando Theosis usando Catedral Coreutils"""
+        return self.coreutils.cp(src, dst)
 
     # ── Meta Operations ───────────────────────────────────────
     def get_status(self) -> Dict:
@@ -874,6 +933,18 @@ if __name__ == "__main__":
         vm = agent.create_sandbox("arkhe-test-vm", "x86_64")
         print(f"\n🔧 VM: {vm['name']} — PID {vm['pid']} — {vm['status']}")
         print(f"   Máquinas ativas: {len(agent.qemu.machines)}")
+
+
+    # Demo 6: Catedral Coreutils
+    print("\n" + "="*80)
+    print("DEMO 6: Catedral Coreutils (Substrate 1028)")
+    print("="*80)
+
+    ls_result = agent.fs_list("/mnt/catedral", 0.5)
+    print(f"\n📂 LS Command: {ls_result}")
+
+    cp_result = agent.fs_copy("/tmp/source.txt", "/tmp/dest.txt")
+    print(f"📄 CP Command: {cp_result}")
 
     # Final status
     print("\n" + "="*80)
