@@ -146,6 +146,47 @@
           "estrutura": "Merkle tree com anchor temporal",
           "retencao": "100000 blocos de audit log",
           "aplicacao_streaming": "Timestamp de cada chunk de dados científicos; prova de primazia sem autoridade central"
+        },
+        "1047": {
+          "nome": "TWIN_WALLET",
+          "tipo": "Identidade Descentralizada / Infraestrutura de Pagamento por Identidade",
+          "era": "11 (Escatologia / Soberania do Usuario)",
+          "deidades": "Hermes, Themis, Hefesto",
+          "status": "CANONIZED_PROVISIONAL",
+          "seal": "TWIN-WALLET-1047-2026-06-03",
+          "cross_links": [
+            "923",
+            "954",
+            "989.x",
+            "972",
+            "1039",
+            "1042.4",
+            "1016"
+          ],
+          "descricao": "O protocolo TwinWallet implementa um padrao de 'financiamento por identidade' (fund-by-identity). Usando CREATE2, deriva enderecos de carteira de forma deterministica a partir de um user_id numerico (ex: Twitch). A verificacao de identidade e realizada inteiramente on-chain via verificacao de assinatura RSA-2048 de JWTs, eliminando a necessidade de oraculos externos. A Catedral reconhece esta arquitetura como uma implementacao concreta de seu principio de identidade verificavel autonoma (Substrato 989.x) e de execucao sem permissao (Substrato 972), com um caminho de atualizacao que espelha o proprio Self-Modify (1039).",
+          "mapeamento_ontologico": {
+            "CREATE2_deterministico": "989.x + 923",
+            "Verificacao_JWT_on_chain": "954",
+            "Nonce_de_acao": "1042.4",
+            "Execucao_permissionless": "972",
+            "Self_custody_upgrade_path": "1016",
+            "Timelock_de_2_dias_mais_veto": "1039",
+            "7_day_key_rotation_timelock": "965",
+            "Abandoned_funds_rescue_90_dias": "923",
+            "lockOpenForever": "1039 (Self-Modify v6.0)"
+          },
+          "contratos_canonizados": {
+            "TwinFactory_v1.3": {
+              "endereco": "0x260C074c3afDc46A209D4619B5FAdB2964dF9a28",
+              "rede": "Base",
+              "funcao": "Forja de enderecos deterministicos. Invoca Hefesto."
+            },
+            "TwitchJWTVerifier_v1.3": {
+              "endereco": "0xBDfC552469f11843802BCD7ec9a8372c8020fee8",
+              "rede": "Base",
+              "funcao": "Oraculo de identidade autonomo. Invoca Themis."
+            }
+          }
         }
       }
     },
