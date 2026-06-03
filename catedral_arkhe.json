@@ -99,6 +99,13 @@
             }
           },
           "aplicacao_streaming": "Proteção pós-quântica de streams contínuos de dados experimentais"
+        },
+        "1041": {
+          "nome": "HERMES-AGENT PENTEST & OSV AUDIT",
+          "status": "CANONIZED_PROVISIONAL",
+          "seal": "HERMES-PENTEST-OSV-1041-2026-06-02",
+          "descricao": "Realiza auditoria de segurança e pentest no Hermes Agent integrado à Catedral (OSV, Agent Loop, Tool Dispatch, Memory Manager).",
+          "integracao_hermes": "Cathedral Pentest Suite"
         }
       }
     },
@@ -318,6 +325,20 @@
             "951-953 Cognitive Ops (LLL + BKZ + NTT)"
           ],
           "aplicacao_streaming": "Orquestração completa do pipeline de streaming science"
+        },
+        "1040": {
+          "nome": "HERMES-CATHEDRAL BRIDGE",
+          "status": "CANONIZED_PROVISIONAL",
+          "seal": "HERMES-CATHEDRAL-BRIDGE-1040-2026-06-02",
+          "descricao": "Integra Hermes Agent (Nous Research) com a ontologia ARKHE",
+          "mapeamentos": {
+            "skills": "WormGraph 5.1 (989.y.5)",
+            "memory": "Memory-Cathedral (968)",
+            "gateway": "ARKHE-GLOBAL-MESH (972)",
+            "cron": "TemporalChain (923)",
+            "subagents": "Enterprise Mind (970)",
+            "mcp": "DKES-NTT (989.y.6.1)"
+          }
         }
       }
     },
