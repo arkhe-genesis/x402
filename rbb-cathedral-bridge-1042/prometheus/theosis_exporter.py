@@ -135,18 +135,53 @@ class TheosisCollector:
 
     def _update_theosis(self):
         """Atualiza métricas de Theosis"""
-        # Em produção, consultaria contrato Bridge ou API Catedral
-        # Simulação baseada em funções determinísticas
         now = time.time()
         seed = int(now / self.update_interval)
 
+        # Tentativa de consultar o modelo/API real do WormGraph 5.0 (zkAGI via llama.cpp server)
+        import urllib.request
+        import json
         import random
-        random.seed(seed)
 
-        self.theosis.level = round(0.3 + random.random() * 0.4, 4)
-        self.theosis.entropy = round(0.4 + random.random() * 0.3, 4)
-        self.theosis.circularity = round(random.random() * 0.02, 6)
-        self.theosis.resilience = round(0.85 + random.random() * 0.15, 4)
+        try:
+            # Emula a porta padrao do ARKHE llama.cpp
+            req = urllib.request.Request(
+                "http://localhost:8080/completion",
+                data=json.dumps({
+                    "prompt": "Forneca as metricas do Theosis atual no formato JSON. Inclua level, entropy, circularity e resilience.",
+                    "n_predict": 128
+                }).encode(),
+                headers={"Content-Type": "application/json"},
+                method="POST"
+            )
+            with urllib.request.urlopen(req, timeout=5) as response:
+                result = json.loads(response.read())
+                content = result.get("content", "")
+
+                import re
+
+                level_match = re.search(r'"?level"?\s*:\s*([0-9.]+)', content)
+                entropy_match = re.search(r'"?entropy"?\s*:\s*([0-9.]+)', content)
+                circularity_match = re.search(r'"?circularity"?\s*:\s*([0-9.]+)', content)
+                resilience_match = re.search(r'"?resilience"?\s*:\s*([0-9.]+)', content)
+
+                if level_match and entropy_match and circularity_match and resilience_match:
+                    self.theosis.level = float(level_match.group(1))
+                    self.theosis.entropy = float(entropy_match.group(1))
+                    self.theosis.circularity = float(circularity_match.group(1))
+                    self.theosis.resilience = float(resilience_match.group(1))
+                else:
+                    raise Exception("Falta de JSON estruturado na resposta do LLM")
+
+        except Exception as e:
+            # Simulação baseada em funções determinísticas (Fallback)
+            print(f"⚠️ Usando fallback determinístico para Theosis: {e}")
+            random.seed(seed)
+            self.theosis.level = round(0.3 + random.random() * 0.4, 4)
+            self.theosis.entropy = round(0.4 + random.random() * 0.3, 4)
+            self.theosis.circularity = round(random.random() * 0.02, 6)
+            self.theosis.resilience = round(0.85 + random.random() * 0.15, 4)
+
         self.theosis.timestamp = now
         self.theosis.epoch = seed
 

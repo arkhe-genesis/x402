@@ -286,6 +286,37 @@ class CathedralAdapter:
             print(f"   Role: {kwargs.get('role', 'ADMIN')}")
             print(f"   ORCID Hash: {hashlib.sha3_256(self.config.orcid.encode()).hexdigest()[:16]}")
 
+    def ask(self, prompt: str):
+        """Consulta o agente zkAGI da Catedral via Ollama"""
+        if not self.config.initialized:
+            print("❌ Integração não inicializada.")
+            return
+
+        print(f"\n🤖 Consultando Agente Catedral (zkAGI)...")
+        print(f"Pergunta: {prompt}\n")
+
+        import urllib.request
+        try:
+            req = urllib.request.Request(
+                "http://ollama:11434/api/generate",
+                data=json.dumps({
+                    "model": "zkagi-cathedral", # Modelo que seria criado usando o Modelfile local
+                    "prompt": prompt,
+                    "stream": False
+                }).encode(),
+                headers={"Content-Type": "application/json"},
+                method="POST"
+            )
+            with urllib.request.urlopen(req, timeout=120) as response:
+                result = json.loads(response.read())
+                print(f"Catedralis: {result.get('response', '')}\n")
+
+        except urllib.error.URLError as e:
+            print(f"❌ Erro ao contatar Ollama (Agent Offline): {e}")
+            print("   Dica: Verifique se o contêiner 'ollama' está rodando e se o modelo 'zkagi-cathedral' foi buildado com o Modelfile.")
+        except Exception as e:
+            print(f"❌ Erro na consulta ao LLM: {e}")
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -323,6 +354,10 @@ def main():
     perm_parser.add_argument("--account", help="Endereço Ethereum")
     perm_parser.add_argument("--role", default="ADMIN", help="Role da conta")
 
+    # ask
+    ask_parser = subparsers.add_parser("ask", help="Pergunta ao agente Catedral (LLM/Ollama)")
+    ask_parser.add_argument("prompt", help="A pergunta ou instrução")
+
     args = parser.parse_args()
 
     if not args.command:
@@ -349,6 +384,8 @@ def main():
             account=args.account,
             role=args.role
         )
+    elif args.command == "ask":
+        adapter.ask(args.prompt)
 
 
 if __name__ == "__main__":

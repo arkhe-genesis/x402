@@ -166,6 +166,22 @@ services:
       - "deidade=Chronos"
       - "componente=temporal-anchor"
 
+  # ─── Ollama Llama Agent (Modelfile wrapper) ───
+  ollama:
+    image: ollama/ollama:latest
+    container_name: cathedral-ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ./adapter:/adapter
+    networks:
+      - rbb-cathedral
+    labels:
+      - "substrato=1042"
+      - "deidade=Thoth"
+      - "componente=ollama-agent"
+
   # ─── Adapter CLI (serviço de background) ───
   adapter-cli:
     build:

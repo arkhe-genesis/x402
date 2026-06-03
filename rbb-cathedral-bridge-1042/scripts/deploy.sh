@@ -336,6 +336,12 @@ case "${1:-}" in
         echo -e "${YELLOW}🏛️  Deidade patrona: ${DEITIES[$1]}${NC}"
         remove_all
         ;;
+    package)
+        echo -e "${YELLOW}📦 Empacotando RBB-CATHEDRAL-BRIDGE...${NC}"
+        cd ..
+        tar -czvf rbb-cathedral-bridge.tar.gz rbb-cathedral-bridge-1042/
+        echo -e "${GREEN}✅ Pacote gerado: ../rbb-cathedral-bridge.tar.gz${NC}"
+        ;;
     *)
         echo "Uso: $0 {install|start|stop|status|logs|remove}"
         echo ""
@@ -346,6 +352,7 @@ case "${1:-}" in
         echo "  status   - Exibe status da integração"
         echo "  logs     - Exibe logs"
         echo "  remove   - Remove toda a instalação"
+        echo "  package  - Empacota o projeto para deploy"
         exit 1
         ;;
 esac

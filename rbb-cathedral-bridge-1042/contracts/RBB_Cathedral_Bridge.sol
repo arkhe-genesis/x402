@@ -9,6 +9,11 @@ pragma solidity ^0.8.19;
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "./RBB_Cathedral_Token.sol";
+
+interface IPlonkVerifier {
+    function verifyProof(bytes memory proof, uint256[] memory pubSignals) external view returns (bool);
+}
 
 /**
  * @title RBB Cathedral Bridge
@@ -72,6 +77,10 @@ contract RBB_Cathedral_Bridge is ReentrancyGuard, AccessControl {
     uint256 public messageNonce;
     uint256 public theosisEpoch;
 
+    // Integrations
+    RBB_Cathedral_Token public bridgeToken;
+    IPlonkVerifier public plonkVerifier;
+
     // Bridge parameters
     uint256 public anchorInterval = 300; // ~20 minutos (300 blocos @ 4s)
     uint256 public minTheosisLevel = 100; // Threshold mínimo
@@ -120,7 +129,10 @@ contract RBB_Cathedral_Bridge is ReentrancyGuard, AccessControl {
     );
 
     // ============ CONSTRUCTOR ============
-    constructor(address _admin) {
+    constructor(address _admin, address _bridgeToken, address _plonkVerifier) {
+        bridgeToken = RBB_Cathedral_Token(_bridgeToken);
+        plonkVerifier = IPlonkVerifier(_plonkVerifier);
+
         _grantRole(DEFAULT_ADMIN_ROLE, _admin);
         _grantRole(BRIDGE_OPERATOR, _admin);
         _grantRole(TEMPORAL_ANCHOR, _admin);
@@ -263,7 +275,53 @@ contract RBB_Cathedral_Bridge is ReentrancyGuard, AccessControl {
         address signer = ethSignedHash.recover(_signature);
         require(hasRole(BRIDGE_OPERATOR, signer), "Bridge: assinatura inválida");
 
-        // Mint tokens (simplificado - em produção usar contract de token)
+        // Mint tokens reais
+        bridgeToken.mint(_recipient, _amount);
+        mintedBalances[_recipient] += _amount;
+        processedMessages[_messageId] = true;
+
+        emit MessageExecuted(_messageId, msg.sender, true);
+        emit TokensMinted(_recipient, _amount, _messageId);
+    }
+
+    /**
+     * @notice Executa mensagem recebida da Catedral exigindo prova ZK PLONK do estado Theosis
+     */
+    function executeMessageWithProof(
+        bytes32 _messageId,
+        address _sender,
+        address _recipient,
+        uint256 _amount,
+        bytes calldata _payload,
+        uint256 _sourceChainId,
+        bytes calldata _signature,
+        bytes calldata _zkProof,
+        uint256[] calldata _pubSignals
+    ) external onlyRole(BRIDGE_OPERATOR) nonReentrant {
+        // Valida prova ZK PLONK
+        require(plonkVerifier.verifyProof(_zkProof, _pubSignals), "Bridge: Prova ZK invalida");
+
+        // Exige um Theosis valido (ex: pubSignals[0] > threshold)
+        require(_pubSignals.length > 0 && _pubSignals[0] >= minTheosisLevel, "Bridge: Theosis insuficiente");
+
+        require(!processedMessages[_messageId], "Bridge: mensagem ja processada");
+        require(_sourceChainId == CATHEDRAL_CHAIN_ID, "Bridge: source invalida");
+
+        // Verificar assinatura do operador Catedral
+        bytes32 messageHash = keccak256(abi.encodePacked(
+            _messageId,
+            _sender,
+            _recipient,
+            _amount,
+            _payload,
+            _sourceChainId
+        ));
+        bytes32 ethSignedHash = messageHash.toEthSignedMessageHash();
+        address signer = ethSignedHash.recover(_signature);
+        require(hasRole(BRIDGE_OPERATOR, signer), "Bridge: assinatura invalida");
+
+        // Mint tokens reais
+        bridgeToken.mint(_recipient, _amount);
         mintedBalances[_recipient] += _amount;
         processedMessages[_messageId] = true;
 
