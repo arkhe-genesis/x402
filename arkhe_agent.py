@@ -25,6 +25,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+from python.x402.zeroex_trading_module import ZeroExTradingModule
+
 # ── Logger ──────────────────────────────────────────────────────
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger("ArkheOS")
@@ -650,6 +652,15 @@ class ArkheAgent:
         if config.qpow_enabled:
             self.qpow = QuantumProofOfWork(backend=config.qpow_backend)
 
+        # ZeroEx Trading Module (Substrato Fast Brain)
+        self.zeroex_trading = ZeroExTradingModule(
+            api_key=os.environ.get("ZEROEX_API_KEY", "mock_key"),
+            chain_id=137, # Polygon
+            wallet_address=os.environ.get("ZEROEX_WALLET_ADDRESS", "0x0000000000000000000000000000000000000000"),
+            zvec_memory=self.memory_space,
+            world_model=self.world_model
+        )
+
         self.total_commits = 0
         self.total_interactions = 0
         self.total_web_queries = 0
@@ -766,6 +777,27 @@ class ArkheAgent:
         """Site-restricted grounding (e.g., arxiv.org, github.com)."""
         logger.info(f"🌐 Site grounding [{site}]: '{query[:60]}...'")
         return self.google.site_restricted_search(query, site, num_results=num_results)
+
+
+    async def execute_trade(self, sell_token: str, buy_token: str, sell_amount: int, slippage_bps: int = 100):
+        """
+        Executes a trade using the ZeroExTradingModule (Fast Brain action).
+        """
+        logger.info(f"⚡ [Fast Brain] Initiating trade: {sell_amount} of {sell_token} for {buy_token} (Slippage: {slippage_bps} bps)")
+
+        result = await self.zeroex_trading.execute_swap(
+            sell_token=sell_token,
+            buy_token=buy_token,
+            sell_amount=sell_amount,
+            slippage_bps=slippage_bps
+        )
+
+        if result:
+            logger.info(f"✅ [Fast Brain] Trade executed successfully! Hash: {result['tx_hash']}, Received: {result.get('buy_amount', 0)}")
+        else:
+            logger.warning("❌ [Fast Brain] Trade failed or aborted due to safety checks.")
+
+        return result
 
     def run_forever(self):
         logger.info("🔄 Agent loop started…")
