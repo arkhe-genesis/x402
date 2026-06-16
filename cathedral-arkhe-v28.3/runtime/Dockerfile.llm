@@ -1,0 +1,29 @@
+FROM ubuntu:22.04 AS builder
+
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    cmake \
+    git \
+    wget \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+# Clone llama.cpp server implementation
+RUN git clone https://github.com/ggerganov/llama.cpp.git && \
+    cd llama.cpp && \
+    mkdir build && cd build && \
+    cmake .. -D LLAMA_CUBLAS=ON && \
+    cmake --build . --config Release
+
+FROM ubuntu:22.04
+
+RUN apt-get update && apt-get install -y \
+    libgomp1 \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+COPY --from=builder /app/llama.cpp/build/bin/server /usr/local/bin/llama-server
+
+EXPOSE 8000
+CMD ["llama-server", "--host", "0.0.0.0", "--port", "8000", "-m", "/models/model.gguf", "-c", "2048"]
