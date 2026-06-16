@@ -39,7 +39,6 @@ import (
 	"flag"
 	"fmt"
 
-
 	"log"
 
 	"net/http"
@@ -93,11 +92,11 @@ const (
 type PixKeyType string
 
 const (
-	KeyCPF    PixKeyType = "cpf"
-	KeyCNPJ   PixKeyType = "cnpj"
-	KeyEmail  PixKeyType = "email"
-	KeyPhone  PixKeyType = "phone"
-	KeyEVP    PixKeyType = "evp" // Endereço Virtual de Pagamento
+	KeyCPF   PixKeyType = "cpf"
+	KeyCNPJ  PixKeyType = "cnpj"
+	KeyEmail PixKeyType = "email"
+	KeyPhone PixKeyType = "phone"
+	KeyEVP   PixKeyType = "evp" // Endereço Virtual de Pagamento
 )
 
 // PixReturnCode define os códigos de retorno ISO 20022.
@@ -131,14 +130,14 @@ type PixTransaction struct {
 
 // PixWebhookEvent é o evento de notificação de liquidação.
 type PixWebhookEvent struct {
-	TxID              string         `json:"txid"`
-	EndToEndID        string         `json:"end_to_end_id"`
-	Status            string         `json:"status"`
-	SettlementTime    float64        `json:"settlement_timestamp"`
-	Amount            float64        `json:"amount"`
-	PayerKey          string         `json:"payer_key"`
-	PayeeKey          string         `json:"payee_key"`
-	RawPayload        map[string]any `json:"raw_payload,omitempty"`
+	TxID           string         `json:"txid"`
+	EndToEndID     string         `json:"end_to_end_id"`
+	Status         string         `json:"status"`
+	SettlementTime float64        `json:"settlement_timestamp"`
+	Amount         float64        `json:"amount"`
+	PayerKey       string         `json:"payer_key"`
+	PayeeKey       string         `json:"payee_key"`
+	RawPayload     map[string]any `json:"raw_payload,omitempty"`
 }
 
 // ============================================================================
@@ -158,23 +157,23 @@ type TemporalMessage struct {
 
 // ConsistencyReport é o relatório de avaliação do Oracle.
 type ConsistencyReport struct {
-	Consistent   bool               `json:"consistent"`
-	Score        float64            `json:"score"`
-	Checks       map[string]float64 `json:"checks,omitempty"`
-	Violations   []string           `json:"violations,omitempty"`
-	ParadoxType  string             `json:"paradox_type,omitempty"`
+	Consistent  bool               `json:"consistent"`
+	Score       float64            `json:"score"`
+	Checks      map[string]float64 `json:"checks,omitempty"`
+	Violations  []string           `json:"violations,omitempty"`
+	ParadoxType string             `json:"paradox_type,omitempty"`
 }
 
 // TemporalBlock é um bloco na cadeia temporal.
 type TemporalBlock struct {
-	Index      int64            `json:"index"`
-	Timestamp  float64          `json:"timestamp"`
-	DataHash   string           `json:"data_hash"`
-	PrevHash   string           `json:"prev_hash"`
-	BlockHash  string           `json:"block_hash"`
-	Data       map[string]any   `json:"data"`
-	Proof      string           `json:"proof"`
-	Depth      float64          `json:"depth"`
+	Index     int64          `json:"index"`
+	Timestamp float64        `json:"timestamp"`
+	DataHash  string         `json:"data_hash"`
+	PrevHash  string         `json:"prev_hash"`
+	BlockHash string         `json:"block_hash"`
+	Data      map[string]any `json:"data"`
+	Proof     string         `json:"proof"`
+	Depth     float64        `json:"depth"`
 }
 
 // ============================================================================
@@ -273,14 +272,14 @@ func NewLocalOracle() *LocalOracle {
 	return &LocalOracle{
 		chain: []TemporalBlock{
 			{
-				Index:      0,
-				Timestamp:  float64(time.Now().Unix()),
-				DataHash:   hashHex([]byte("ARKHE_GENESIS")),
-				PrevHash:   strings.Repeat("0", 64),
-				BlockHash:  hashHex([]byte("ARKHE_GENESIS")),
-				Data:       map[string]any{"type": "genesis"},
-				Proof:      "GENESIS",
-				Depth:      0,
+				Index:     0,
+				Timestamp: float64(time.Now().Unix()),
+				DataHash:  hashHex([]byte("ARKHE_GENESIS")),
+				PrevHash:  strings.Repeat("0", 64),
+				BlockHash: hashHex([]byte("ARKHE_GENESIS")),
+				Data:      map[string]any{"type": "genesis"},
+				Proof:     "GENESIS",
+				Depth:     0,
 			},
 		},
 		count: 1,
@@ -292,14 +291,14 @@ func (o *LocalOracle) Evaluate(msg *TemporalMessage) (*ConsistencyReport, error)
 		Consistent: true,
 		Score:      1.0,
 		Checks: map[string]float64{
-			"harmless":     1.0,
-			"paradox_free": 1.0,
-			"entropy_safe": 1.0,
-			"coherent":     1.0,
-			"zk_valid":     1.0,
-			"quantum_time": 1.0,
+			"harmless":        1.0,
+			"paradox_free":    1.0,
+			"entropy_safe":    1.0,
+			"coherent":        1.0,
+			"zk_valid":        1.0,
+			"quantum_time":    1.0,
 			"solar_coherence": 1.0,
-			"galactic_auth": 1.0,
+			"galactic_auth":   1.0,
 		},
 		Violations:  []string{},
 		ParadoxType: "",
@@ -340,14 +339,14 @@ func (o *LocalOracle) InsertBlock(msg *TemporalMessage, report *ConsistencyRepor
 		"checks":  report.Checks,
 	}
 	block := TemporalBlock{
-		Index:      o.count,
-		Timestamp:  msg.TargetTimestamp,
-		DataHash:   hashHex(mustMarshal(data)),
-		PrevHash:   o.chain[len(o.chain)-1].BlockHash,
-		BlockHash:  hashHex(append(mustMarshal(data), []byte(o.chain[len(o.chain)-1].BlockHash)...)),
-		Data:       data,
-		Proof:      string(mustMarshal(report.Checks)),
-		Depth:      (msg.TargetTimestamp - msg.SourceTimestamp) / (365.25 * 86400),
+		Index:     o.count,
+		Timestamp: msg.TargetTimestamp,
+		DataHash:  hashHex(mustMarshal(data)),
+		PrevHash:  o.chain[len(o.chain)-1].BlockHash,
+		BlockHash: hashHex(append(mustMarshal(data), []byte(o.chain[len(o.chain)-1].BlockHash)...)),
+		Data:      data,
+		Proof:     string(mustMarshal(report.Checks)),
+		Depth:     (msg.TargetTimestamp - msg.SourceTimestamp) / (365.25 * 86400),
 	}
 	o.chain = append(o.chain, block)
 	o.count++
@@ -473,14 +472,14 @@ func (m *X402Middleware) HandlePaymentVerify(w http.ResponseWriter, r *http.Requ
 	targetTS := sourceTS + PixSettlementSeconds
 
 	content := mustMarshal(map[string]any{
-		"protocol":     "x402",
-		"pix_version":  "2.0",
-		"txid":         req.TxID,
-		"amount_brl":   req.Amount,
-		"payer_key":    maskKey(req.PayerKey),
-		"payee_key":    maskKey(req.PayeeKey),
-		"bcb_res":      "493/2025",
-		"iso_20022":    true,
+		"protocol":    "x402",
+		"pix_version": "2.0",
+		"txid":        req.TxID,
+		"amount_brl":  req.Amount,
+		"payer_key":   maskKey(req.PayerKey),
+		"payee_key":   maskKey(req.PayeeKey),
+		"bcb_res":     "493/2025",
+		"iso_20022":   true,
 	})
 
 	temporalMsg := &TemporalMessage{
@@ -491,9 +490,9 @@ func (m *X402Middleware) HandlePaymentVerify(w http.ResponseWriter, r *http.Requ
 		SenderSeal:      "PIX-PAYER-" + hashKey(req.PayerKey),
 		ReceiverSeal:    "PIX-PAYEE-" + hashKey(req.PayeeKey),
 		Metadata: map[string]any{
-			"protocol":    "x402",
-			"pix_version": "2.0",
-			"iso_20022":   true,
+			"protocol":      "x402",
+			"pix_version":   "2.0",
+			"iso_20022":     true,
 			"bcb_compliant": true,
 		},
 	}
@@ -507,10 +506,10 @@ func (m *X402Middleware) HandlePaymentVerify(w http.ResponseWriter, r *http.Requ
 
 	// 3. Se aprovado, registrar na cadeia temporal
 	response := map[string]any{
-		"x402_version": X402Version,
-		"status":       "PENDING",
-		"txid":         req.TxID,
-		"oracle_score": report.Score,
+		"x402_version":  X402Version,
+		"status":        "PENDING",
+		"txid":          req.TxID,
+		"oracle_score":  report.Score,
 		"oracle_checks": report.Checks,
 	}
 
@@ -602,8 +601,8 @@ func (m *X402Middleware) HandleMED(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var req struct {
-		OriginalTxID string `json:"original_txid"`
-		Reason       string `json:"reason"`
+		OriginalTxID string  `json:"original_txid"`
+		Reason       string  `json:"reason"`
 		Amount       float64 `json:"amount"`
 	}
 
@@ -642,12 +641,12 @@ func (m *X402Middleware) HandleMED(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response := map[string]any{
-		"med_txid":     reversalMsg.ID,
-		"oracle_score": report.Score,
-		"oracle_checks": report.Checks,
+		"med_txid":         reversalMsg.ID,
+		"oracle_score":     report.Score,
+		"oracle_checks":    report.Checks,
 		"quantum_coherent": report.Checks["paradox_free"] >= 0.95,
-		"paradox_type":  report.ParadoxType,
-		"status":        "PENDING",
+		"paradox_type":     report.ParadoxType,
+		"status":           "PENDING",
 	}
 
 	if report.Consistent {
@@ -698,16 +697,16 @@ func hashHex(data []byte) string {
 // generateBRCode gera o payload de QR Code Pix (formato EMVCo).
 func generateBRCode(txID string, amount float64, payeeKey string) string {
 	fields := []string{
-		"000201",           // Payload Format Indicator
-		"010212",           // Point of Initiation Method (dinâmico)
+		"000201",                 // Payload Format Indicator
+		"010212",                 // Point of Initiation Method (dinâmico)
 		"26140014br.gov.bcb.pix", // Merchant Account Information (Pix)
 		fmt.Sprintf("2567%02d%s", len(payeeKey), payeeKey), // Chave Pix
-		"52040000",         // Merchant Category Code (0000)
-		"5303986",          // Transaction Currency (986 = BRL)
-		fmt.Sprintf("5405%012.2f", amount), // Transaction Amount
-		"5802BR",           // Country Code
-		"5913ARKHE-TEMP",   // Merchant Name
-		"6008BRASILIA",     // Merchant City
+		"52040000",                          // Merchant Category Code (0000)
+		"5303986",                           // Transaction Currency (986 = BRL)
+		fmt.Sprintf("5405%012.2f", amount),  // Transaction Amount
+		"5802BR",                            // Country Code
+		"5913ARKHE-TEMP",                    // Merchant Name
+		"6008BRASILIA",                      // Merchant City
 		fmt.Sprintf("62140508%s", txID[:8]), // Additional Data Field
 	}
 	payload := strings.Join(fields, "")
