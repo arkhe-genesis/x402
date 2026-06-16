@@ -16,7 +16,7 @@ except ImportError as e:
     ) from e
 
 from ....interfaces import FacilitatorContext  # noqa: E402
-from ....schemas import (  # noqa: E402
+from x402.schemas import (  # noqa: E402
     PaymentPayload,
     PaymentRequirements,
     SettleResponse,

@@ -28,8 +28,8 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from ..client import x402Client, x402ClientSync
-from ..schemas.payments import PaymentRequired
-from ..schemas.responses import SettleResponse
+from x402.schemas.payments import PaymentRequired
+from x402.schemas.responses import SettleResponse
 from .constants import MCP_PAYMENT_META_KEY, MCP_PAYMENT_RESPONSE_META_KEY
 from .utils import (
     convert_mcp_result,

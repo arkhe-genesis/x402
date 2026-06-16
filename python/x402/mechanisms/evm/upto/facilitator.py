@@ -4,7 +4,7 @@ import random
 from dataclasses import dataclass
 from typing import Any
 
-from ....schemas import (
+from x402.schemas import (
     Network,
     PaymentPayload,
     PaymentRequirements,
