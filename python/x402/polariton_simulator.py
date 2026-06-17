@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 # "polariton_simulator.py" — Substrato 862
-import numpy as np
 import hashlib
+
+import numpy as np
+
 
 class PolaritonCondensate:
     """
@@ -20,7 +22,7 @@ class PolaritonCondensate:
     def step(self, steps=2000):
         """Simula a dinâmica e mede a coerência do condensado."""
         dt = 0.01
-        for t in range(steps):
+        for _t in range(steps):
             # Interação Kuramoto
             delta = np.subtract.outer(self.theta, self.theta)
             coupling = (self.K / self.N) * np.sum(np.sin(delta), axis=1)

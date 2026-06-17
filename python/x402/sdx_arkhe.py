@@ -30,9 +30,9 @@ Propriedades de dados:
   sdx:licenseSPDX, sdx:repositoryURL, sdx:buildDate, sdx:buildEnvironment
 """
 
-import hashlib
+
 import json
-from datetime import datetime, timezone
+
 
 class SDXArkhe:
     """Motor de descrição ontológica de artefatos de software."""

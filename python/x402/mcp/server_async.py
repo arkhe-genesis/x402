@@ -7,6 +7,7 @@ from collections.abc import Awaitable, Callable
 from typing import Any
 
 from x402.schemas import PaymentRequirements, ResourceInfo
+
 from ..server import x402ResourceServer as x402ResourceServerAsync
 from .types import (
     MCP_PAYMENT_RESPONSE_META_KEY,

@@ -6,12 +6,14 @@
 ╚══════════════════════════════════════════════════════════════════════════════╝
 """
 
-import time
-import random
 import asyncio
-from typing import Dict, List, Optional, Callable, Any
-from dataclasses import dataclass, field
+import random
+import time
 from collections import deque
+from collections.abc import Callable
+from dataclasses import dataclass, field
+from typing import Any
+
 
 @dataclass
 class Message:
@@ -20,7 +22,7 @@ class Message:
     timestamp: float = field(default_factory=time.time)
     partition: int = 0
     offset: int = 0
-    key: Optional[str] = None
+    key: str | None = None
 
 class Topic:
     """Tópico de mensagens com partições."""
@@ -28,9 +30,9 @@ class Topic:
     def __init__(self, name: str, n_partitions: int = 3):
         self.name = name
         self.n_partitions = n_partitions
-        self.partitions: Dict[int, deque] = {i: deque(maxlen=10000) for i in range(n_partitions)}
-        self.offsets: Dict[int, int] = {i: 0 for i in range(n_partitions)}
-        self.consumers: Dict[str, int] = {}  # consumer -> last offset
+        self.partitions: dict[int, deque] = {i: deque(maxlen=10000) for i in range(n_partitions)}
+        self.offsets: dict[int, int] = dict.fromkeys(range(n_partitions), 0)
+        self.consumers: dict[str, int] = {}  # consumer -> last offset
 
     def publish(self, message: Message):
         partition = self._select_partition(message)
@@ -44,7 +46,7 @@ class Topic:
             return hash(message.key) % self.n_partitions
         return random.randint(0, self.n_partitions - 1)
 
-    def consume(self, consumer_id: str, partition: int, batch_size: int = 10) -> List[Message]:
+    def consume(self, consumer_id: str, partition: int, batch_size: int = 10) -> list[Message]:
         last_offset = self.consumers.get(consumer_id, 0)
         messages = []
         queue = self.partitions[partition]
@@ -59,7 +61,7 @@ class EventBus:
     """Event Bus com pub/sub pattern."""
 
     def __init__(self):
-        self.subscribers: Dict[str, List[Callable]] = {}
+        self.subscribers: dict[str, list[Callable]] = {}
         self.event_history: deque = deque(maxlen=1000)
 
     def subscribe(self, event_type: str, handler: Callable):
@@ -74,7 +76,7 @@ class EventBus:
         for handler in self.subscribers.get(event_type, []):
             handler(payload)
 
-    def get_history(self, event_type: str = None) -> List[Dict]:
+    def get_history(self, event_type: str = None) -> list[dict]:
         if event_type:
             return [e for e in self.event_history if e["type"] == event_type]
         return list(self.event_history)
@@ -88,7 +90,7 @@ class AsyncProcessor:
         self.processed = 0
         self.failed = 0
 
-    async def enqueue(self, task: Dict):
+    async def enqueue(self, task: dict):
         await self.queue.put(task)
 
     async def worker(self):
@@ -103,7 +105,7 @@ class AsyncProcessor:
             finally:
                 self.queue.task_done()
 
-    async def process(self, task: Dict):
+    async def process(self, task: dict):
         # Simulate processing
         await asyncio.sleep(random.uniform(0.01, 0.1))
         print(f"[Async] Processed: {task}")
@@ -116,7 +118,7 @@ class MessageOrchestrator:
     """Orquestrador de mensagens integrando Kafka + Pub/Sub + Async."""
 
     def __init__(self):
-        self.topics: Dict[str, Topic] = {}
+        self.topics: dict[str, Topic] = {}
         self.event_bus = EventBus()
         self.async_processor = AsyncProcessor()
 

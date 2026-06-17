@@ -6,12 +6,11 @@
 ╚══════════════════════════════════════════════════════════════════════════════╝
 """
 
-import socket
-import random
 import asyncio
-from typing import Dict, List, Optional, Callable
+import random
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from collections import deque
+
 
 @dataclass
 class DNSRecord:
@@ -24,14 +23,14 @@ class DNSResolver:
     """Simulação de resolver DNS com cache."""
 
     def __init__(self):
-        self.cache: Dict[str, DNSRecord] = {}
-        self.authoritative: Dict[str, str] = {
+        self.cache: dict[str, DNSRecord] = {}
+        self.authoritative: dict[str, str] = {
             "arkhe.io": "104.21.45.100",
             "arkhe-g.arkhe.io": "104.21.45.101",
             "arkhe-871.arkhe.io": "104.21.45.102",
         }
 
-    def resolve(self, domain: str) -> Optional[str]:
+    def resolve(self, domain: str) -> str | None:
         if domain in self.cache:
             return self.cache[domain].ip
         if domain in self.authoritative:
@@ -47,13 +46,13 @@ class DNSResolver:
 class HTTPRequest:
     method: str
     path: str
-    headers: Dict[str, str] = field(default_factory=dict)
+    headers: dict[str, str] = field(default_factory=dict)
     body: str = ""
 
 @dataclass
 class HTTPResponse:
     status: int
-    headers: Dict[str, str] = field(default_factory=dict)
+    headers: dict[str, str] = field(default_factory=dict)
     body: str = ""
 
 class HTTPServer:
@@ -62,7 +61,7 @@ class HTTPServer:
     def __init__(self, host: str = "0.0.0.0", port: int = 8080):
         self.host = host
         self.port = port
-        self.routes: Dict[str, Callable] = {}
+        self.routes: dict[str, Callable] = {}
         self.tls_enabled = True
 
     def route(self, path: str):
@@ -80,14 +79,14 @@ class HTTPServer:
 class LoadBalancer:
     """Load Balancer com múltiplos algoritmos."""
 
-    def __init__(self, backends: List[str], algorithm: str = "round_robin"):
+    def __init__(self, backends: list[str], algorithm: str = "round_robin"):
         self.backends = backends
         self.algorithm = algorithm
         self.current_index = 0
         self.weights = [1.0] * len(backends)
-        self.health_status = {b: True for b in backends}
+        self.health_status = dict.fromkeys(backends, True)
 
-    def get_backend(self) -> Optional[str]:
+    def get_backend(self) -> str | None:
         healthy = [b for b in self.backends if self.health_status[b]]
         if not healthy:
             return None
@@ -143,8 +142,8 @@ class WebSocketManager:
     """Gerenciador de conexões WebSocket."""
 
     def __init__(self):
-        self.connections: Dict[str, asyncio.Queue] = {}
-        self.subscriptions: Dict[str, List[str]] = {}
+        self.connections: dict[str, asyncio.Queue] = {}
+        self.subscriptions: dict[str, list[str]] = {}
 
     def connect(self, client_id: str):
         self.connections[client_id] = asyncio.Queue()

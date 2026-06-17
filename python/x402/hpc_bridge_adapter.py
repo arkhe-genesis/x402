@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 # "hpc_bridge_adapter.py" — Substrato 855
 # Adaptador para submissão de jobs ARKHE em clusters HPC via Slurm
-import subprocess
 import hashlib
-import os
-from typing import Dict, Optional
+import subprocess
+
 
 class HPCArkheBridge:
     """
@@ -16,7 +15,7 @@ class HPCArkheBridge:
         self.nodes = nodes
         self.gpus = gpus_per_node
 
-    def submit_arkhe_job(self, substrate_id: str, payload_script: str) -> Dict:
+    def submit_arkhe_job(self, substrate_id: str, payload_script: str) -> dict:
         """
         Submete um job ARKHE ao Slurm, injetando o prompt canônico.
         Retorna o ID do job e o selo de submissão.
@@ -61,7 +60,7 @@ export ARKHE_PHI_C=0.998
                                 capture_output=True, text=True)
         return result.stdout.strip().split('\n')[0] if result.stdout else "UNKNOWN"
 
-    def run_mpi_kuramoto(self, N: int, K: float, steps: int) -> Dict:
+    def run_mpi_kuramoto(self, N: int, K: float, steps: int) -> dict:
         """
         Executa uma simulação de Kuramoto distribuída via MPI.
         Cada rank MPI é um nó do hipergrafo canônico.

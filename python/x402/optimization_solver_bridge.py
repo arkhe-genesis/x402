@@ -2,7 +2,9 @@
 # "optimization_solver_bridge.py" — Substrato 854
 # Adaptador universal para solveres de otimização
 import hashlib
-from pulp import LpProblem, LpMaximize, LpVariable, LpBinary, lpSum, LpStatus, value
+
+from pulp import LpBinary, LpMaximize, LpProblem, LpStatus, LpVariable, lpSum, value
+
 
 class ArkheOptimizationBridge:
     """
@@ -23,7 +25,7 @@ class ArkheOptimizationBridge:
 
         # Variáveis binárias: ativar ou não o Pod para cada substrato
         pod_vars = {}
-        for sid, data in substrates.items():
+        for sid, _data in substrates.items():
             pod_vars[sid] = LpVariable(f"pod_{sid}", 0, 1, LpBinary)
 
         # Função objetivo: maximizar soma ponderada de Φ_C

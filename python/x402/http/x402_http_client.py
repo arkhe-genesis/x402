@@ -11,6 +11,7 @@ from typing import TYPE_CHECKING, Any
 
 from x402.schemas import PaymentPayload, PaymentRequired
 from x402.schemas.v1 import PaymentPayloadV1, PaymentRequiredV1
+
 from .x402_http_client_base import x402HTTPClientBase
 
 if TYPE_CHECKING:

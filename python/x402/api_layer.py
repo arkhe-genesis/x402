@@ -6,33 +6,35 @@
 ╚══════════════════════════════════════════════════════════════════════════════╝
 """
 
-import time
 import hashlib
 import json
-from typing import Dict, List, Optional, Any, Callable
-from dataclasses import dataclass, field
+import time
 from collections import defaultdict
+from collections.abc import Callable
+from dataclasses import dataclass, field
+from typing import Any
+
 
 @dataclass
 class APIRequest:
     method: str
     path: str
-    headers: Dict[str, str] = field(default_factory=dict)
+    headers: dict[str, str] = field(default_factory=dict)
     body: Any = None
-    api_key: Optional[str] = None
+    api_key: str | None = None
 
 @dataclass
 class APIResponse:
     status: int
     body: Any = None
-    headers: Dict[str, str] = field(default_factory=dict)
+    headers: dict[str, str] = field(default_factory=dict)
 
 class RESTEndpoint:
     """Endpoint REST com métodos HTTP padrão."""
 
     def __init__(self, path: str):
         self.path = path
-        self.handlers: Dict[str, Callable] = {}
+        self.handlers: dict[str, Callable] = {}
 
     def get(self, handler: Callable):
         self.handlers["GET"] = handler
@@ -53,9 +55,9 @@ class GraphQLEngine:
 
     def __init__(self):
         self.schema = {}
-        self.resolvers: Dict[str, Callable] = {}
+        self.resolvers: dict[str, Callable] = {}
 
-    def define_type(self, name: str, fields: Dict[str, str]):
+    def define_type(self, name: str, fields: dict[str, str]):
         self.schema[name] = fields
 
     def resolver(self, type_name: str, field: str):
@@ -65,7 +67,7 @@ class GraphQLEngine:
             return func
         return decorator
 
-    def execute(self, query: str) -> Dict:
+    def execute(self, query: str) -> dict:
         # Simplified: parse query and execute resolvers
         results = {}
         for key, resolver in self.resolvers.items():
@@ -79,7 +81,7 @@ class RateLimiter:
     def __init__(self, max_requests: int = 100, window_seconds: int = 60):
         self.max_requests = max_requests
         self.window = window_seconds
-        self.requests: Dict[str, List[float]] = defaultdict(list)
+        self.requests: dict[str, list[float]] = defaultdict(list)
 
     def is_allowed(self, client_id: str) -> bool:
         now = time.time()
@@ -105,9 +107,9 @@ class JWTAuth:
 
     def __init__(self, secret: str = "arkhe-secret-key"):
         self.secret = secret
-        self.tokens: Dict[str, Dict] = {}
+        self.tokens: dict[str, dict] = {}
 
-    def generate_token(self, user_id: str, claims: Dict) -> str:
+    def generate_token(self, user_id: str, claims: dict) -> str:
         header = json.dumps({"alg": "HS256", "typ": "JWT"})
         payload = json.dumps({"sub": user_id, **claims, "iat": time.time()})
 
@@ -122,14 +124,14 @@ class JWTAuth:
         self.tokens[token] = {"user_id": user_id, "claims": claims}
         return token
 
-    def verify_token(self, token: str) -> Optional[Dict]:
+    def verify_token(self, token: str) -> dict | None:
         return self.tokens.get(token)
 
 class APIGateway:
     """API Gateway unificando REST, GraphQL e gRPC."""
 
     def __init__(self):
-        self.rest_endpoints: Dict[str, RESTEndpoint] = {}
+        self.rest_endpoints: dict[str, RESTEndpoint] = {}
         self.graphql = GraphQLEngine()
         self.rate_limiter = RateLimiter()
         self.auth = JWTAuth()
