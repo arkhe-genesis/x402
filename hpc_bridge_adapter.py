@@ -3,8 +3,7 @@
 # Adaptador para submissão de jobs ARKHE em clusters HPC via Slurm
 import subprocess
 import hashlib
-import os
-from typing import Dict, Optional
+from typing import Dict
 
 class HPCArkheBridge:
     """

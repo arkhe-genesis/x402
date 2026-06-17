@@ -25,12 +25,10 @@ CBDCs:
 """
 
 import argparse
-import json
 import hashlib
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 from datetime import datetime
-from typing import Dict, List, Optional
-from pathlib import Path
+from typing import List
 
 # ─── BRICS+ DATA ───
 BRICS_MEMBERS = {
@@ -120,7 +118,7 @@ class BRICSAdapter:
 
         avg_theosis = total_theosis / active_count if active_count > 0 else 0
         print()
-        print(f"   📈 Estatísticas Mesh:")
+        print("   📈 Estatísticas Mesh:")
         print(f"      Países ativos: {active_count}")
         print(f"      Theosis médio: {avg_theosis/100:.1f}%")
         print(f"      Pares CBDC: {len(CBDC_PAIRS)}")
@@ -159,7 +157,7 @@ class BRICSAdapter:
             print(f"\n🤝 {country} — BRICS+ Partner")
             print(f"   Código: {data['code']}")
             print(f"   Região: {data['region']}")
-            print(f"   Status: Observer (sem Theosis atribuído)")
+            print("   Status: Observer (sem Theosis atribuído)")
         else:
             print(f"❌ País não encontrado: {country}")
 
@@ -194,11 +192,11 @@ class BRICSAdapter:
         if src_data['theosis'] < 2000:
             print(f"⚠️  {source} tem Theosis baixo ({src_data['theosis']/100:.1f}%). Transação pode ser rejeitada.")
 
-        print(f"\n💱 Transação Cross-Border BRICS+")
+        print("\n💱 Transação Cross-Border BRICS+")
         print(f"   {source} ({src_data['cbdc'] or 'Fiat'}) → {target} ({tgt_data['cbdc'] or 'Fiat'})")
         print(f"   Valor: {amount:,.2f} USD equivalente")
         print(f"   Theosis remetente: {src_data['theosis']/100:.1f}%")
-        print(f"   Status: ✅ Simulada com sucesso")
+        print("   Status: ✅ Simulada com sucesso")
 
         # Gerar message ID
         msg_id = "0x" + hashlib.sha3_256(

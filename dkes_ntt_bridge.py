@@ -12,7 +12,6 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from typing import Tuple, Optional, Dict, List
 
 # =============================================================================
 # 1. NTT ENGINE (FFT-based — referência correta)

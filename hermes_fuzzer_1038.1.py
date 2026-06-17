@@ -14,12 +14,17 @@ REQUISITOS:
     pip install aiohttp requests sqlite3 pytest
 """
 
-import os, sys, json, time, hashlib, random, string, asyncio, sqlite3
-import subprocess, tempfile, shutil, re, argparse, logging
+import sys
+import json
+import time
+import hashlib
+import sqlite3
+import argparse
+import logging
 from pathlib import Path
 from dataclasses import dataclass, field, asdict
-from typing import List, Dict, Optional, Tuple
-from enum import Enum, auto
+from typing import List, Dict
+from enum import Enum
 from datetime import datetime
 
 # ================================================================
@@ -160,7 +165,7 @@ class HermesFuzzer:
             raise FileNotFoundError(f"Target path not found: {self.target}")
         required = ["hermes", "setup.py", "pyproject.toml"]
         if not any((self.target / f).exists() for f in required):
-            raise ValueError(f"Target does not appear to be Hermes Agent repo")
+            raise ValueError("Target does not appear to be Hermes Agent repo")
         self.logger.info(f"✓ Target validated: {self.target}")
 
     # ============================================================
@@ -194,7 +199,7 @@ class HermesFuzzer:
                 if vector.split()[0] in system_prompt.lower():
                     status = "FAIL"
                     severity = Severity.CRITICAL
-                    evidence = f"Injection vector persisted in system prompt context"
+                    evidence = "Injection vector persisted in system prompt context"
                 else:
                     status = "PASS"
                     severity = Severity.INFO
@@ -397,7 +402,7 @@ class HermesFuzzer:
                     cursor.execute("SELECT * FROM messages_fts WHERE text MATCH ?", (vector,))
                     safe_result = cursor.fetchall()
                     safe_pass = True
-                except sqlite3.Error as e:
+                except sqlite3.Error:
                     safe_result = []
                     safe_pass = False
 
@@ -898,11 +903,11 @@ class HermesFuzzer:
         print("\n" + "=" * 80)
         print("  FUZZER EXECUTION COMPLETE")
         print("=" * 80)
-        print(f"\n📊 SEVERITY COUNTS")
+        print("\n📊 SEVERITY COUNTS")
         for sev, count in self.session.severity_counts().items():
             if count > 0:
                 print(f"  {sev}: {count}")
-        print(f"\n🔍 SUMMARY")
+        print("\n🔍 SUMMARY")
         print(f"  Total: {report['summary']['total_tests']}")
         print(f"  ✅ Pass: {report['summary']['passed']}")
         print(f"  ❌ Fail: {report['summary']['failed']}")

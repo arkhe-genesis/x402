@@ -6,11 +6,11 @@
 ╚══════════════════════════════════════════════════════════════════════════════╝
 """
 
-import time
 import random
-from typing import Dict, List, Optional, Any
+import time
 from dataclasses import dataclass, field
 from enum import Enum
+
 
 class DeploymentStrategy(Enum):
     ROLLING = "rolling"
@@ -24,8 +24,8 @@ class Container:
 
     image: str
     tag: str = "latest"
-    env: Dict[str, str] = field(default_factory=dict)
-    ports: Dict[int, int] = field(default_factory=dict)
+    env: dict[str, str] = field(default_factory=dict)
+    ports: dict[int, int] = field(default_factory=dict)
     status: str = "stopped"
     health: bool = True
 
@@ -45,7 +45,7 @@ class Container:
 class K8sPod:
     """Pod Kubernetes simulado."""
 
-    def __init__(self, name: str, containers: List[Container], replicas: int = 1):
+    def __init__(self, name: str, containers: list[Container], replicas: int = 1):
         self.name = name
         self.containers = containers
         self.replicas = replicas
@@ -75,11 +75,11 @@ class CICDPipeline:
 
     def __init__(self, name: str):
         self.name = name
-        self.stages: List[Dict] = []
-        self.artifacts: List[str] = []
+        self.stages: list[dict] = []
+        self.artifacts: list[str] = []
         self.status = "idle"
 
-    def add_stage(self, name: str, steps: List[str]):
+    def add_stage(self, name: str, steps: list[str]):
         self.stages.append({"name": name, "steps": steps, "status": "pending"})
 
     def run(self) -> bool:
@@ -109,17 +109,17 @@ class InfrastructureAsCode:
     """Infraestrutura como Código (IaC)."""
 
     def __init__(self):
-        self.resources: Dict[str, Dict] = {}
-        self.state: Dict[str, str] = {}
+        self.resources: dict[str, dict] = {}
+        self.state: dict[str, str] = {}
 
-    def define_resource(self, name: str, resource_type: str, config: Dict):
+    def define_resource(self, name: str, resource_type: str, config: dict):
         self.resources[name] = {
             "type": resource_type,
             "config": config,
             "status": "defined"
         }
 
-    def plan(self) -> List[str]:
+    def plan(self) -> list[str]:
         changes = []
         for name, resource in self.resources.items():
             if name not in self.state:
@@ -138,11 +138,11 @@ class BlueGreenDeployer:
     """Deployer Blue-Green."""
 
     def __init__(self):
-        self.blue: Optional[K8sPod] = None
-        self.green: Optional[K8sPod] = None
+        self.blue: K8sPod | None = None
+        self.green: K8sPod | None = None
         self.active = "blue"
 
-    def deploy(self, new_version: str, containers: List[Container]):
+    def deploy(self, new_version: str, containers: list[Container]):
         # Deploy to inactive environment
         inactive = "green" if self.active == "blue" else "blue"
         new_pod = K8sPod(f"{inactive}-deployment", containers)
@@ -175,11 +175,11 @@ class CanaryDeployer:
 
     def __init__(self, total_pods: int = 10):
         self.total_pods = total_pods
-        self.canary_pods: List[K8sPod] = []
-        self.stable_pods: List[K8sPod] = []
+        self.canary_pods: list[K8sPod] = []
+        self.stable_pods: list[K8sPod] = []
         self.canary_percentage = 0
 
-    def start_canary(self, canary_containers: List[Container], percentage: float = 10.0):
+    def start_canary(self, canary_containers: list[Container], percentage: float = 10.0):
         self.canary_percentage = percentage
         n_canary = int(self.total_pods * percentage / 100)
 
@@ -210,8 +210,8 @@ class ARKHEDeployer:
     """Deployer ARKHE: arkhe deploy --substrate 873 --target k8s"""
 
     def __init__(self):
-        self.pods: Dict[str, K8sPod] = {}
-        self.pipelines: Dict[str, CICDPipeline] = {}
+        self.pods: dict[str, K8sPod] = {}
+        self.pipelines: dict[str, CICDPipeline] = {}
 
     def deploy_substrate(self, substrate_id: str, image: str,
                         strategy: DeploymentStrategy = DeploymentStrategy.ROLLING):
@@ -235,7 +235,7 @@ class ARKHEDeployer:
             return True
         return False
 
-    def status(self) -> Dict:
+    def status(self) -> dict:
         return {
             "pods": {k: v.status for k, v in self.pods.items()},
             "pipelines": {k: v.status for k, v in self.pipelines.items()}

@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 # "neuromorphic_bridge_adapter.py" — Substrato 857
 # Adaptador para plataformas neuromórficas
-import numpy as np
 import hashlib
-from typing import Dict, List, Tuple
+
+import numpy as np
+
 
 class IzhikevichNeuron:
     """Modelo de neurônio Izhikevich para simulação neuromórfica."""
@@ -39,7 +40,7 @@ class NeuromorphicArkheBridge:
         self.weights = np.random.uniform(0.5, 2.0, (num_neurons, num_neurons))
         self.phi_history = []
 
-    def run_spiking_network(self, steps: int, external_input: float = 10.0) -> Dict:
+    def run_spiking_network(self, steps: int, external_input: float = 10.0) -> dict:
         """
         Executa a rede de spiking neurons por um número de passos.
         Calcula a coerência de disparo (análogo ao parâmetro de ordem de Kuramoto).
@@ -88,7 +89,7 @@ Ghost Threshold (γ): 0.577 | Status: {status}
 <|ARKHE_END|>"""
         return {"phi_c": phi_c, "rates": rates, "decree": decree, "seal": seal}
 
-    def deploy_to_loihi(self, substrate_ids: List[str]) -> str:
+    def deploy_to_loihi(self, substrate_ids: list[str]) -> str:
         """
         Stub para compilar um grafo de substratos em uma SNN para Loihi.
         Em produção, usaria o NxSDK ou Lava.

@@ -7,10 +7,10 @@
 """
 
 import time
-import random
-from typing import Dict, Optional, Any, List
-from dataclasses import dataclass
 from collections import OrderedDict
+from dataclasses import dataclass
+from typing import Any
+
 
 @dataclass
 class CacheEntry:
@@ -37,7 +37,7 @@ class LRUCache:
         self.cache: OrderedDict[str, CacheEntry] = OrderedDict()
         self.current_size = 0
 
-    def get(self, key: str) -> Optional[Any]:
+    def get(self, key: str) -> Any | None:
         if key not in self.cache:
             return None
 
@@ -86,7 +86,7 @@ class LRUCache:
 class WriteThroughCache:
     """Cache com estratégia write-through."""
 
-    def __init__(self, cache: LRUCache, backend_store: Dict):
+    def __init__(self, cache: LRUCache, backend_store: dict):
         self.cache = cache
         self.backend = backend_store
 
@@ -95,7 +95,7 @@ class WriteThroughCache:
         self.cache.set(key, value)
         self.backend[key] = value
 
-    def read(self, key: str) -> Optional[Any]:
+    def read(self, key: str) -> Any | None:
         # Try cache first
         cached = self.cache.get(key)
         if cached is not None:
@@ -112,11 +112,11 @@ class CDNNode:
     def __init__(self, region: str, capacity: int = 10000):
         self.region = region
         self.capacity = capacity
-        self.storage: Dict[str, Any] = {}
+        self.storage: dict[str, Any] = {}
         self.hit_count = 0
         self.miss_count = 0
 
-    def serve(self, content_id: str) -> Optional[Any]:
+    def serve(self, content_id: str) -> Any | None:
         if content_id in self.storage:
             self.hit_count += 1
             return self.storage[content_id]
@@ -134,12 +134,12 @@ class CacheOrchestrator:
     def __init__(self):
         self.l1_cache = LRUCache(max_size=100, default_ttl=60)   # In-memory
         self.l2_cache = LRUCache(max_size=1000, default_ttl=300)  # Redis-like
-        self.cdn_nodes: List[CDNNode] = []
+        self.cdn_nodes: list[CDNNode] = []
 
     def add_cdn_node(self, region: str):
         self.cdn_nodes.append(CDNNode(region))
 
-    def get(self, key: str) -> Optional[Any]:
+    def get(self, key: str) -> Any | None:
         # L1 -> L2 -> CDN
         for cache in [self.l1_cache, self.l2_cache]:
             value = cache.get(key)

@@ -3,19 +3,15 @@ import time
 import hashlib
 import random
 import logging
-from typing import Dict, List, Tuple, Optional, Callable, Any, Set
+from typing import Dict, List, Tuple, Set
 from dataclasses import dataclass, field, asdict
-from enum import Enum, auto
-from decimal import Decimal, ROUND_HALF_UP
+from enum import Enum
+from decimal import Decimal
 from collections import defaultdict, deque
-from datetime import datetime, timedelta
 
 import numpy as np
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
 
-from prometheus_client import Counter, Histogram, Gauge, Info, CollectorRegistry
+from prometheus_client import Counter, Histogram, Gauge
 
 # =============================================================================
 # 1. CONFIGURAÇÃO & ENUMS
@@ -544,7 +540,7 @@ class AutonomousDeltaHedger:
         r = 0.05
         sigma = 0.5
 
-        from math import log, sqrt, exp, pi
+        from math import log, sqrt, pi
         d1 = (log(S / K) + (r + 0.5 * sigma**2) * T) / (sigma * sqrt(T))
 
         # Aproximação da CDF normal

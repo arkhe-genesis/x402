@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
 # "quantum_neuromorphic_optimizer.py"
 # Usa VQE para otimizar a matriz de pesos de uma rede neuromórfica
-import numpy as np
 import hashlib
+
+import numpy as np
 
 # Mock Qiskit if not available
 try:
     from qiskit import QuantumCircuit
     from qiskit.algorithms import VQE
-    from qiskit.primitives import Estimator
     from qiskit.circuit.library import EfficientSU2
+    from qiskit.primitives import Estimator
     QISKIT_AVAILABLE = True
 except ImportError:
     QISKIT_AVAILABLE = False

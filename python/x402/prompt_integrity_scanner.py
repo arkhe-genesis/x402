@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # "prompt_integrity_scanner.py" — Substrato 863.2
 # Analisa arquivos como .cursorrules e CLAUDE.md em busca de instruções ocultas
-import os
-import unicodedata
 import hashlib
+import unicodedata
+
 
 class PromptIntegrityScanner:
     DANGEROUS_CHARS = {
@@ -16,7 +16,7 @@ class PromptIntegrityScanner:
 
     def scan_file(self, filepath):
         try:
-            with open(filepath, 'r', encoding='utf-8') as f:
+            with open(filepath, encoding='utf-8') as f:
                 content = f.read()
         except FileNotFoundError:
             print(f"[ERRO] Arquivo não encontrado: {filepath}")

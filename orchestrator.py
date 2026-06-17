@@ -19,16 +19,15 @@
 import numpy as np
 import hashlib
 import secrets
-import json
 import time
-from typing import Dict, List, Tuple, Optional, Callable
+from typing import Dict, List, Tuple, Optional
 from dataclasses import dataclass, asdict
 from collections import deque
 
 # Importações dos substratos (assumem que os arquivos estão no path)
 from lattice_crypto import Kyber768, Dilithium3, NTT
 from mesh_passport import PQMeshProtocol, PQPassportGateway, PQMeshConsensus, MeshNodeIdentity, PassportStamp
-from cognitive_operators import LLLDreamOrganizer, BKZDeepAttention, NTTPerception, CathedralCognitivePipeline
+from cognitive_operators import CathedralCognitivePipeline
 
 
 # ================================================================
@@ -143,7 +142,7 @@ class CathedralOrchestrator:
             "953": "ACTIVE"      # Tanmatra
         }
 
-        print(f"[ORCHESTRATOR] Todos os substratos inicializados.")
+        print("[ORCHESTRATOR] Todos os substratos inicializados.")
         print(f"[ORCHESTRATOR] Seal: {self.config.seal}")
 
         return identity
@@ -448,8 +447,8 @@ def run_integration_test():
     valid = orch.crypto_verify(pk_d, msg, sig)
     assert valid, "Dilithium verification failed"
 
-    print(f"  ✓ Kyber encaps/decaps: OK")
-    print(f"  ✓ Dilithium sign/verify: OK")
+    print("  ✓ Kyber encaps/decaps: OK")
+    print("  ✓ Dilithium sign/verify: OK")
     print(f"  ✓ Shared secret: {ss_enc.hex()[:16]}...")
 
     # 3. Mesh Handshake (972.2)
@@ -459,7 +458,7 @@ def run_integration_test():
 
     result = orch.mesh_handshake(peer_id)
     print(f"  ✓ Session ID: {result['session_id']}")
-    print(f"  ✓ Handshake PQ estabelecido")
+    print("  ✓ Handshake PQ estabelecido")
 
     # 4. Passport (989.x)
     print("\n[4] Teste Passport Gateway (Credentials)")
@@ -480,7 +479,7 @@ def run_integration_test():
     assert stamp_valid, "Stamp verification failed"
 
     passport_result = orch.passport_create("0009-0005-2697-4670", [stamp])
-    print(f"  ✓ Stamp issued and verified")
+    print("  ✓ Stamp issued and verified")
     print(f"  ✓ Passport humanity: {passport_result['is_human']} "
           f"(confidence: {passport_result['confidence']:.2%})")
 

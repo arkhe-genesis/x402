@@ -12,7 +12,6 @@
 import pytest
 import numpy as np
 import secrets
-import hashlib
 import time
 from collections import deque
 
@@ -404,7 +403,6 @@ class TestPassportGateway:
 
     def test_expired_stamp(self, passport_gateway):
         """Stamp expirado deve ser rejeitado."""
-        from mesh_passport import SecurityException
         stamp = PassportStamp(
             stamp_type="github",
             stamp_id="user123",
@@ -438,7 +436,7 @@ class TestPassportGateway:
         sig = passport_gateway.issue_stamp(stamp)
 
         # Revogar
-        stamp_key = f"0009-0005-2697-4670:github:user123"
+        stamp_key = "0009-0005-2697-4670:github:user123"
         passport_gateway.revoke_stamp(stamp_key)
 
         assert not passport_gateway.verify_stamp(stamp, sig, passport_gateway.pk)
@@ -488,7 +486,6 @@ class TestPassportGateway:
             )
         ]
 
-        from mesh_passport import SecurityException
         try:
             result = passport_gateway.create_full_passport("0009-0005-4697-4670", stamps)
             assert len(result.stamps) < 2

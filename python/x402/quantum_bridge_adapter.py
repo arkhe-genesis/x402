@@ -2,13 +2,11 @@
 # "quantum_bridge_adapter.py" — Substrato 856
 # Adaptador para computação quântica via Qiskit
 import hashlib
-import numpy as np
-from typing import Dict, List, Optional
 
 try:
     from qiskit import QuantumCircuit, execute
-    from qiskit_aer import Aer
     from qiskit.visualization import plot_histogram
+    from qiskit_aer import Aer
     QISKIT_AVAILABLE = True
 except ImportError:
     QISKIT_AVAILABLE = False
@@ -48,7 +46,7 @@ class QuantumArkheBridge:
         qc.measure_all()
         return qc
 
-    def execute_canonical_circuit(self, substrate_ids: List[str], depth: int = 3) -> Dict:
+    def execute_canonical_circuit(self, substrate_ids: list[str], depth: int = 3) -> dict:
         """
         Executa um circuito canônico representando os substratos fornecidos.
         Retorna a distribuição de coerência e um decreto.
@@ -105,7 +103,7 @@ Status: {'CANONIZED_CLEAN' if phi_c >= 0.577 else 'DECOHERENCE'}
             "circuit_depth": depth,
         }
 
-    def run_vqe_coherence_optimization(self, hamiltonian: List[float]) -> Dict:
+    def run_vqe_coherence_optimization(self, hamiltonian: list[float]) -> dict:
         """
         Executa um VQE para encontrar a configuração de mínima energia (máxima coerência).
         O Hamiltoniano representa as restrições das 18 invariantes.

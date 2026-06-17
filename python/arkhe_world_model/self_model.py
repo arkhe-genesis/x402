@@ -19,8 +19,7 @@ Arquitetura:
 
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
-from typing import Dict, Tuple
+from typing import Dict
 
 class SelfModelingModule(nn.Module):
     """

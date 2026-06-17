@@ -3,8 +3,10 @@
 # Telco-NFV Peptide Bridge: models NFV/SDN as peptides & hypergraph
 
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional
-import hashlib, json, requests
+from typing import Dict, List
+import hashlib
+import json
+import requests
 
 @dataclass
 class TelcoNFVPeptide:

@@ -13,12 +13,13 @@ Integra Hermes Agent (Nous Research) com a ontologia ARKHE:
 - Hermes MCP → DKES-NTT (989.y.6.1)
 """
 
-import json, hashlib, time, asyncio
-from typing import Dict, List, Optional, Any, Callable
-from dataclasses import dataclass, field
+import json
+import hashlib
+import time
+from typing import Dict, List, Optional
+from dataclasses import dataclass
 from collections import deque
-from enum import Enum, auto
-import sqlite3  # FTS5 for Hermes memory
+from enum import Enum
 import numpy as np
 
 # ===================== CONSTANTES =====================

@@ -4,6 +4,7 @@ import json
 from typing import Any
 
 from x402.schemas import PaymentPayload, PaymentRequired, SettleResponse
+
 from .types import (
     MCP_PAYMENT_META_KEY,
     MCP_PAYMENT_REQUIRED_CODE,

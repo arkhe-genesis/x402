@@ -2,8 +2,7 @@
 # "sap_ariba_adapter.py" — Substrato 853
 # Adaptador para SAP S/4HANA e Ariba via RFC/OData
 import hashlib
-from typing import Dict, List, Optional
-from dataclasses import dataclass
+from typing import Dict, List
 from pyrfc import Connection
 
 class SAPArkheAdapter:

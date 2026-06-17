@@ -16,7 +16,7 @@ Este módulo define a interface entre o DKES_NTT (software) e o Safe-Core-PQC
 """
 
 from dataclasses import dataclass
-from typing import List, Tuple, Optional, Dict
+from typing import List, Tuple, Optional
 import hashlib
 
 # =============================================================================

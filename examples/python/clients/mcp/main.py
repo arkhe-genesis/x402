@@ -9,8 +9,8 @@ Usage:
 
 import sys
 
-from simple import run_simple
 from advanced import run_advanced
+from simple import run_simple
 
 if __name__ == "__main__":
     mode = sys.argv[1] if len(sys.argv) > 1 else "simple"

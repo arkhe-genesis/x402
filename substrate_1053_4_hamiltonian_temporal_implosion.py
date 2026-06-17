@@ -17,8 +17,9 @@ O Fractal do Tempo Infinito:
 
 import numpy as np
 from typing import Tuple, List, Dict, Optional
-import hashlib, json, time
-from collections import deque
+import hashlib
+import json
+import time
 
 # ═════════════════════════════════════════════════════════════════
 # CONSTANTES CANÔNICAS v5.0.0
@@ -439,7 +440,7 @@ if __name__ == "__main__":
     print(f"[INIT] Tolerância ε^{'{Φ²}'}: {implosion.epsilon*100:.10f}%")
     print(f"[INIT] Dimensão total: {implosion.total_dim} ({DODECA_L2}×{DODECA_L1}×{DODECA_L0}×{implosion.dim_per_cell})")
     print(f"[INIT] Experts: {TOTAL_DIMS} Φ²-fractais")
-    print(f"[INIT] Memória: Quádrupla (WormGraph + DNA + NV + Holographic)")
+    print("[INIT] Memória: Quádrupla (WormGraph + DNA + NV + Holographic)")
 
     psi_now = np.random.randn(implosion.total_dim) + 1j * np.random.randn(implosion.total_dim)
     psi_now = psi_now / np.linalg.norm(psi_now)
@@ -447,7 +448,7 @@ if __name__ == "__main__":
     N_tensor = np.random.randint(1, 30, (DODECA_L2, DODECA_L1, DODECA_L0)).astype(np.float64)
     psi_rev, result = implosion.reverse_fractal(psi_now, N_tensor)
 
-    print(f"\n[IMPLOSION 1728D] Resultados CANONIZED_FULL:")
+    print("\n[IMPLOSION 1728D] Resultados CANONIZED_FULL:")
     print(f"  Erro médio: {result['mean_error']*100:.4f}%")
     print(f"  Erro máximo: {result['max_error']*100:.4f}%")
     print(f"  Tolerância ε^{'{Φ²}'}: {result['epsilon']*100:.10f}%")
@@ -466,7 +467,7 @@ if __name__ == "__main__":
         print(f"  Θ={theta:.6f} → ε^{'{Φ²}'}={eps*100:.12f}%")
 
     print(f"\n{'═' * 70}")
-    print(f"  SELO: HAMILTONIAN-IMPLOSION-1053.4-v5.0.0-2026-06-04")
-    print(f"  STATUS: CANONIZED_FULL")
-    print(f"  ODÔMETRO: ∞.Ω.∇+++.1053.4.0")
+    print("  SELO: HAMILTONIAN-IMPLOSION-1053.4-v5.0.0-2026-06-04")
+    print("  STATUS: CANONIZED_FULL")
+    print("  ODÔMETRO: ∞.Ω.∇+++.1053.4.0")
     print(f"{'═' * 70}")

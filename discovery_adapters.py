@@ -4,9 +4,9 @@
 import boto3
 from azure.mgmt.compute import ComputeManagementClient
 from azure.identity import DefaultAzureCredential
-from pyVmomi import vim, vmodl
+from pyVmomi import vim
 from pyVim import connect
-import json, requests
+import requests
 
 class MultiCloudDiscovery:
     def __init__(self, hypergraph_api_endpoint="http://localhost:9290/api"):

@@ -18,10 +18,10 @@ import secrets
 import json
 import time
 from typing import Tuple, Dict, Optional, List, Callable
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 
 # Importar primitivas do Substrato 955.1
-from lattice_crypto import Kyber768, Dilithium3, NTT
+from lattice_crypto import Kyber768, Dilithium3
 
 # ================================================================
 # 1. PROTOCOLO DE HANDSHAKE PQ PARA MESH (Substrato 972)

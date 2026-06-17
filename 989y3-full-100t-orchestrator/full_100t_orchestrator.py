@@ -18,11 +18,10 @@ import hashlib
 import json
 import random
 import time
-from typing import Dict, Optional, List, Any, Tuple, Set
+from typing import Dict, Optional, List, Any, Tuple
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
-from collections import defaultdict
 import heapq
 
 
@@ -386,7 +385,7 @@ class Full100TOrchestrator:
         lines.append("║  'Zeus governa; Athena escolhe; Hephaestus forja; Hermes conecta'" + " " * 1 + "║")
         lines.append("╠" + "═" * 68 + "╣")
         lines.append(f"  Seal: {self.SEAL}")
-        lines.append(f"  Status: CANONIZED_PROVISIONAL")
+        lines.append("  Status: CANONIZED_PROVISIONAL")
         lines.append("")
         lines.append("  MÉTRICAS GLOBAIS")
         lines.append("  ────────────────")

@@ -9,11 +9,10 @@ Seal: ZKCBDC-1010-2026-05-31
 
 import hashlib
 import secrets
-from typing import Dict, List, Optional, Tuple, Set
+from typing import Dict, Optional, Set
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
-import json
 
 # Canonical constants
 SHA3 = hashlib.sha3_256

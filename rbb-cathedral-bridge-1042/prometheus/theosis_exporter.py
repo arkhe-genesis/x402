@@ -280,11 +280,11 @@ class TheosisCollector:
         # Cross-links
         lines.append("# HELP catedral_cross_link_count Links cruzados ativos")
         lines.append("# TYPE catedral_cross_link_count gauge")
-        lines.append(f'catedral_cross_link_count{{substrate="1042"}} 19')
+        lines.append('catedral_cross_link_count{substrate="1042"} 19')
 
         lines.append("# HELP catedral_bridge_info Informações da bridge")
         lines.append("# TYPE catedral_bridge_info gauge")
-        lines.append(f'catedral_bridge_info{{version="1.0.0",chain_id="12120014",substrate="1042"}} 1')
+        lines.append('catedral_bridge_info{version="1.0.0",chain_id="12120014",substrate="1042"} 1')
 
         return "\n".join(lines) + "\n"
 

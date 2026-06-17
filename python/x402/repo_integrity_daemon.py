@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 # "repo_integrity_daemon.py" — Substrato 863.1
 # Monitora novos pacotes em PyPI, npm, Crates.io em busca de nomes suspeitos
-import requests
 import hashlib
-import time
-import json
+
+import requests
 
 SUSPICIOUS_PATTERNS = [
     "security", "wallet", "auditor", "defi", "risk", "scanner",

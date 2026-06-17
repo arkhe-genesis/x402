@@ -2,7 +2,10 @@
 # substrate_933_bfi_bridge.py — Substrato 933
 # Brazilian Financial Infrastructure Bridge for ARKHE‑OS
 
-import hashlib, json, requests, time
+import hashlib
+import json
+import requests
+import time
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Dict

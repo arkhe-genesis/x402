@@ -25,7 +25,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 from typing import Dict, Optional, Tuple, List
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
 
 class MaturityLevel(Enum):
@@ -116,11 +116,11 @@ class WorldModelEmbryo(nn.Module):
         self._training_history: List[Dict] = []
         self._is_trained = False
 
-        print(f"[890] WorldModelEmbryo inicializado")
+        print("[890] WorldModelEmbryo inicializado")
         print(f"[890] Maturidade: {self.maturity.value}")
         print(f"[890] Estágios ativos: {[s.name for s in self.active_stages]}")
         print(f"[890] d_model={self.config.d_model}, state_dim={self.config.state_dim}")
-        print(f"[890] ⚠️  CANONIZED_SPECULATIVE — H=2.0 (alta incerteza)")
+        print("[890] ⚠️  CANONIZED_SPECULATIVE — H=2.0 (alta incerteza)")
 
     def _get_active_stages(self) -> List[DevelopmentStage]:
         """Retorna estágios ativos baseado na maturidade."""

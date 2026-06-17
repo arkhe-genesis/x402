@@ -15,9 +15,8 @@ Este módulo define o fluxo completo de tape-out ASIC:
 - Wafer fabrication tracking
 """
 
-from dataclasses import dataclass, field
-from typing import List, Dict, Tuple, Optional
-from datetime import datetime, timedelta
+from dataclasses import dataclass
+from typing import List, Dict
 import json
 
 # =============================================================================
@@ -192,7 +191,7 @@ class ASICTapeOutFlow:
 
     def run_routing(self) -> Dict:
         """Fase 4: Routing."""
-        print(f"[PHASE 4] Routing")
+        print("[PHASE 4] Routing")
 
         phase = {
             'name': 'Routing',
@@ -208,7 +207,7 @@ class ASICTapeOutFlow:
 
     def run_signoff(self) -> Dict:
         """Fase 5: Sign-off (STA, Power, Noise, Reliability)."""
-        print(f"[PHASE 5] Sign-off")
+        print("[PHASE 5] Sign-off")
 
         # Static Timing Analysis
         sta = {
@@ -249,7 +248,7 @@ class ASICTapeOutFlow:
 
     def run_physical_verification(self) -> Dict:
         """Fase 6: Physical Verification (DRC/LVS/ERC)."""
-        print(f"[PHASE 6] Physical Verification")
+        print("[PHASE 6] Physical Verification")
 
         # DRC — Design Rule Check
         drc = {
@@ -284,7 +283,7 @@ class ASICTapeOutFlow:
 
     def generate_gdsii(self) -> Dict:
         """Fase 7: GDSII Generation."""
-        print(f"[PHASE 7] GDSII Generation")
+        print("[PHASE 7] GDSII Generation")
 
         self.gdsii = {
             'format': 'GDSII Stream',
@@ -306,7 +305,7 @@ class ASICTapeOutFlow:
 
     def generate_mask_data(self) -> Dict:
         """Fase 8: Mask Data Preparation (MDP)."""
-        print(f"[PHASE 8] Mask Data Preparation")
+        print("[PHASE 8] Mask Data Preparation")
 
         # MEB / EUV masks
         masks = []
@@ -430,7 +429,7 @@ class ASICTapeOutFlow:
         lines.extend([
             "",
             "=" * 70,
-            f"Seal: ASIC-TAPEOUT-DKES-2026-06-02",
+            "Seal: ASIC-TAPEOUT-DKES-2026-06-02",
             f"Status: {self.status}",
             f"Ready for: {self.node.foundry} MPW / Shuttle",
             "=" * 70,

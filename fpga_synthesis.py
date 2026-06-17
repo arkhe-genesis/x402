@@ -15,8 +15,6 @@ Este módulo gera scripts de síntese FPGA completos para o DKES_RTL:
 """
 
 from dataclasses import dataclass
-from typing import List, Dict, Tuple
-import json
 
 # =============================================================================
 # 1. CONFIGURAÇÃO FPGA — Alveo U280 / Virtex UltraScale+ VU37P
@@ -264,8 +262,8 @@ class FPGAUtilizationReport:
             "=" * 70,
             f"System Clock: {self.config.sys_clk_mhz} MHz (period: {1000/self.config.sys_clk_mhz:.3f} ns)",
             f"NTT Clock: {self.config.ntt_clk_mhz} MHz (period: {1000/self.config.ntt_clk_mhz:.3f} ns)",
-            f"WNS (Setup): 0.234 ns",
-            f"WNS (Hold): 0.089 ns",
+            "WNS (Setup): 0.234 ns",
+            "WNS (Hold): 0.089 ns",
             f"Max Frequency: {self.config.sys_clk_mhz * 1.07:.1f} MHz",
             "",
             "=" * 70,

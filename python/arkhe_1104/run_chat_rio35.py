@@ -19,7 +19,6 @@ import sys
 import time
 import hashlib
 from dataclasses import dataclass, asdict
-from pathlib import Path
 from typing import List, Dict, Optional, Tuple
 from datetime import datetime, timezone
 
@@ -106,7 +105,7 @@ class Rio35InferenceEngine:
     def _load_model(self):
         """Load Rio-3.5 with trust_remote_code (TEE-protected)."""
         print(f"[Rio35Engine] Loading {self.MODEL_ID}...")
-        print(f"[Rio35Engine] trust_remote_code=True (FIG 1091.0 monitoring active)")
+        print("[Rio35Engine] trust_remote_code=True (FIG 1091.0 monitoring active)")
 
         self.tokenizer = AutoTokenizer.from_pretrained(
             self.MODEL_ID,
@@ -424,7 +423,7 @@ def main():
         sys.exit(1)
 
     print("=" * 60)
-    print(f"ARKHE-CATHEDRAL SWIREASONING RUN")
+    print("ARKHE-CATHEDRAL SWIREASONING RUN")
     print(f"Engine: {args.engine} | Method: {args.method}")
     print(f"Prompt hash: {hashlib.sha256(prompt.encode()).hexdigest()[:16]}")
     print("=" * 60)

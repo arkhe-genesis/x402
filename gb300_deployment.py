@@ -15,8 +15,8 @@ Este módulo define o deployment completo do DKES_NTT no cluster GB300:
 """
 
 from dataclasses import dataclass, field
-from typing import List, Dict, Tuple, Optional
-from datetime import datetime, timedelta
+from typing import List, Dict
+from datetime import datetime
 import json
 import hashlib
 
@@ -353,7 +353,7 @@ if __name__ == "__main__":
     node = GB300Node()
     cluster = GB300Cluster()
 
-    print(f"\n[CLUSTER CONFIG]")
+    print("\n[CLUSTER CONFIG]")
     print(f"  Name: {cluster.name}")
     print(f"  Nodes: {cluster.nodes}")
     print(f"  Racks: {cluster.racks}")
@@ -361,7 +361,7 @@ if __name__ == "__main__":
     print(f"  Cooling: {cluster.cooling_type}")
     print(f"  Storage: {cluster.parallel_storage_pb} PB (parallel) + {cluster.object_storage_pb} PB (object)")
 
-    print(f"\n[GB300 NODE SPEC]")
+    print("\n[GB300 NODE SPEC]")
     print(f"  CPU: {node.cpu_cores} cores @ {node.cpu_freq_ghz} GHz")
     print(f"  GPU: {node.gpu_count}x Blackwell ({node.gpu_fp8_tflops:.0f} TFLOPS FP8)")
     print(f"  GPU Memory: {node.gpu_memory_gb} GB HBM3e")
@@ -373,20 +373,20 @@ if __name__ == "__main__":
     orch = GB300DeploymentOrchestrator(cluster)
 
     # Deploy DKES
-    print(f"\n[DEPLOYMENT]")
+    print("\n[DEPLOYMENT]")
     deploy_result = orch.deploy_dkes_service(num_replicas=2048)
     print(f"  Replicas requested: {deploy_result['replicas_requested']}")
     print(f"  Replicas deployed: {deploy_result['replicas_deployed']}")
     print(f"  Nodes active: {deploy_result['nodes_active']}")
 
     # Simular inferências
-    print(f"\n[INFERENCE ROUTING]")
+    print("\n[INFERENCE ROUTING]")
     for i in range(5):
         result = orch.route_inference(f"query_{i:04d}", [0.0] * 512)
         print(f"  Query {i}: node={result['node_id']}, latency={result['latency_ms']:.1f}ms, charge=${result['mpp_charge_usd']:.6f}")
 
     # Health check
-    print(f"\n[HEALTH CHECK]")
+    print("\n[HEALTH CHECK]")
     health = orch.global_health_check()
     print(f"  Active: {health['active']}/{health['total_nodes']}")
     print(f"  Availability: {health['availability']:.1%}")
@@ -395,7 +395,7 @@ if __name__ == "__main__":
     print(f"  Theosis Global: {health['theosis_global']:.2f}")
 
     # Telemetria
-    print(f"\n[TELEMETRY]")
+    print("\n[TELEMETRY]")
     telem = GB300Telemetry(orch)
     metrics = telem.collect()
     chain_hash = telem.write_to_temporalchain(metrics)

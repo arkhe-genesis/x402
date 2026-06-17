@@ -1,6 +1,5 @@
 # test_paxos_gateway.py
 import pytest
-import asyncio
 from decimal import Decimal
 from unittest.mock import AsyncMock, patch
 from paxos_gateway import PaxosUSDGGateway, PaxosCredentials, PaxosBalance

@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 # "polariton_simulator.py" — Substrato 862
-import numpy as np
 import hashlib
+
+import numpy as np
+
 
 class PolaritonCondensate:
     """

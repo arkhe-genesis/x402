@@ -2,10 +2,11 @@
 """Canonical tests — Substrate 1010 zkCBDC"""
 
 import pytest
-import sys, os
+import sys
+import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from zkcbdc_engine import ZKCBCC, ConfidentialTransaction, TransactionStatus, AccountState
+from zkcbdc_engine import ZKCBCC, TransactionStatus
 
 @pytest.fixture
 def engine():

@@ -2,7 +2,9 @@
 # "optimization_solver_bridge.py" — Substrato 854
 # Adaptador universal para solveres de otimização
 import hashlib
-from pulp import LpProblem, LpMaximize, LpVariable, LpBinary, lpSum, LpStatus, value
+
+from pulp import LpBinary, LpMaximize, LpProblem, LpStatus, LpVariable, lpSum, value
+
 
 class ArkheOptimizationBridge:
     """

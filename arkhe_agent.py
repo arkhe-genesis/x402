@@ -17,7 +17,7 @@ import os
 import urllib.parse
 import urllib.request
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 from dataclasses import dataclass, field
 
 import numpy as np
@@ -79,7 +79,7 @@ class GoogleGroundingLayer:
                     f"providing concise summaries with title, URL, and contextual excerpt. "
                     f"This result was retrieved via {engine} search engine."
                 ),
-                "htmlSnippet": f"<b>Google</b> result snippet for query...",
+                "htmlSnippet": "<b>Google</b> result snippet for query...",
                 "htmlTitle": f"Result {i+1} — {query[:30]}",
                 "cacheId": f"cache-{seed[:8]}-{i}",
                 "formattedUrl": f"{domain}/article/{seed[:8]}-{i}",
@@ -839,14 +839,14 @@ class ArkheAgent:
 ╚══════════════════════════════════════════════════════════╝
 """
         kr = self.world_model.get_complexity_report()
-        report += f"\n🧠 Kolmogorov Complexity (Ethical Parsimony):\n"
+        report += "\n🧠 Kolmogorov Complexity (Ethical Parsimony):\n"
         report += f"  Total params: {kr['total_params']}\n"
         report += f"  K upper bound: {kr['K_upper_bound']:.2f} bits\n"
-        report += f"\n🌐 Google Web Grounding (Substrato 917):\n"
-        report += f"  Real-time perception via Google Search API\n"
-        report += f"  Engines: Google / Google News / Google Scholar\n"
-        report += f"  Backends: Google CSE API + SerpAPI fallback\n"
-        report += f"  Mock mode: deterministic demo when keys unset\n"
+        report += "\n🌐 Google Web Grounding (Substrato 917):\n"
+        report += "  Real-time perception via Google Search API\n"
+        report += "  Engines: Google / Google News / Google Scholar\n"
+        report += "  Backends: Google CSE API + SerpAPI fallback\n"
+        report += "  Mock mode: deterministic demo when keys unset\n"
         return report
 
 # ═══════════════════════════════════════════════════════════════════
@@ -887,11 +887,11 @@ if __name__ == "__main__":
         "latest advances in quantum computing error correction",
         engine="google"
     )
-    print(f"\n🧠 Self-Model:")
+    print("\n🧠 Self-Model:")
     print(f"  Confidence: {perception['self_model']['confidence']:.3f}")
     print(f"  Uncertainty: {perception['self_model']['uncertainty']:.3f}")
     print(f"  Novelty: {perception['self_model']['novelty']:.3f}")
-    print(f"\n🌐 Web Context (first 300 chars):")
+    print("\n🌐 Web Context (first 300 chars):")
     print(f"  {perception['web_context'][:300]}...")
 
     # Demo 2: News grounding
@@ -949,7 +949,7 @@ if __name__ == "__main__":
     print("="*60)
 
     google_peptide = agent.google.to_peptide_descriptor(news)
-    print(f"\n🔬 Google Peptide Descriptor:")
+    print("\n🔬 Google Peptide Descriptor:")
     print(f"   Sequence: {google_peptide['sequence']}")
     print(f"   Hash: {google_peptide['source_code_hash']}")
     print(f"   API: {google_peptide['api_endpoints']}")

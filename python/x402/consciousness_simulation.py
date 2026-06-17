@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 # "consciousness_simulation.py" — Substrato 860
 # Calculador de Φ (IIT simplificado) para o campo ξM
-import numpy as np
 import hashlib
+
+import numpy as np
+
 
 def integrated_information(phi_history, gamma=0.577):
     """

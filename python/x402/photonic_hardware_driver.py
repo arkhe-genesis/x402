@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # "photonic_hardware_driver.py" — Substrato 862.1
 # Interface para hardware fotônico (Xanadu Strawberry Fields, simulação pura)
-import numpy as np
 import hashlib
-from typing import Optional
+
+import numpy as np
 
 # Tentar importar Strawberry Fields; se não disponível, usar simulador clássico
 try:

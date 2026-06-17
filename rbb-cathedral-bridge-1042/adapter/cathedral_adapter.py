@@ -18,9 +18,7 @@ Uso:
 import argparse
 import json
 import hashlib
-import subprocess
 import sys
-import os
 from pathlib import Path
 from typing import Optional, Dict, Any
 from dataclasses import dataclass, asdict
@@ -134,13 +132,13 @@ class CathedralAdapter:
 
         self._save_config()
 
-        print(f"\n✅ Integração inicializada!")
+        print("\n✅ Integração inicializada!")
         print(f"   Substrate Seal: {self.config.substrate_seal}")
         print(f"   Config salva em: {CATHEDRAL_CONFIG_FILE}")
-        print(f"\nPróximos passos:")
-        print(f"   1. Execute: ./rbb-cli cathedral theosis")
-        print(f"   2. Execute: ./rbb-cli cathedral anchor")
-        print(f"   3. Solicite permissionamento ao Comitê Técnico RBB")
+        print("\nPróximos passos:")
+        print("   1. Execute: ./rbb-cli cathedral theosis")
+        print("   2. Execute: ./rbb-cli cathedral anchor")
+        print("   3. Solicite permissionamento ao Comitê Técnico RBB")
 
     def theosis(self):
         """Reporta e exibe métricas de Theosis"""
@@ -180,7 +178,7 @@ class CathedralAdapter:
             data = f"cathedral_anchor:{datetime.utcnow().isoformat()}:{self.config.substrate_seal}"
             merkle_root = "0x" + hashlib.sha3_256(data.encode()).hexdigest()
 
-        print(f"\n⚓ Ancorando na RBB...")
+        print("\n⚓ Ancorando na RBB...")
         print(f"   Merkle Root: {merkle_root}")
         print(f"   Chain ID: {RBB_CHAIN_ID}")
         print(f"   Bridge Contract: {self.config.bridge_contract}")
@@ -191,10 +189,10 @@ class CathedralAdapter:
             f"{merkle_root}:{RBB_CHAIN_ID}:{self.config.substrate_seal}".encode()
         ).hexdigest()
 
-        print(f"\n✅ Anchor criado!")
+        print("\n✅ Anchor criado!")
         print(f"   Anchor ID: {anchor_id}")
         print(f"   Bloco: ~{self._run_besu_command('eth_blockNumber', []) or 'N/A'}")
-        print(f"   Próxima ancora em: ~300 blocos (20 min)")
+        print("   Próxima ancora em: ~300 blocos (20 min)")
 
         return anchor_id
 
@@ -220,8 +218,8 @@ class CathedralAdapter:
         print(f"   Theosis: {theosis['level']}")
 
         print("\n✅ Sincronização concluída!")
-        print(f"   Status: OPERACIONAL")
-        print(f"   Cross-links ativos: 19 substratos")
+        print("   Status: OPERACIONAL")
+        print("   Cross-links ativos: 19 substratos")
 
     def status(self):
         """Exibe status completo da integração"""
@@ -234,7 +232,7 @@ class CathedralAdapter:
             return
 
         print(f"   Versão: {self.config.version}")
-        print(f"   Status: ATIVO")
+        print("   Status: ATIVO")
         print(f"   ORCID: {self.config.orcid}")
         print(f"   Organização: {self.config.organization}")
         print(f"   Tipo de nó: {self.config.node_type}")
@@ -272,16 +270,16 @@ class CathedralAdapter:
     def permissionamento(self, action: str, **kwargs):
         """Gerencia permissionamento na RBB"""
         if action == "register-node":
-            print(f"\n📋 Registrando nó no permissionamento RBB...")
+            print("\n📋 Registrando nó no permissionamento RBB...")
             print(f"   Enode High: {kwargs.get('enode_high', 'N/A')}")
             print(f"   Enode Low: {kwargs.get('enode_low', 'N/A')}")
             print(f"   Node Type: {kwargs.get('node_type', '2')}")  # Writer=2
             print(f"   Name: {kwargs.get('name', self.config.organization)}")
-            print(f"\n⚠️  Ação requer aprovação do Comitê Técnico RBB")
-            print(f"   Envie proposta para: rbb@bndes.gov.br")
+            print("\n⚠️  Ação requer aprovação do Comitê Técnico RBB")
+            print("   Envie proposta para: rbb@bndes.gov.br")
 
         elif action == "register-account":
-            print(f"\n👤 Registrando conta administrativa...")
+            print("\n👤 Registrando conta administrativa...")
             print(f"   Account: {kwargs.get('account', 'N/A')}")
             print(f"   Role: {kwargs.get('role', 'ADMIN')}")
             print(f"   ORCID Hash: {hashlib.sha3_256(self.config.orcid.encode()).hexdigest()[:16]}")
@@ -292,7 +290,7 @@ class CathedralAdapter:
             print("❌ Integração não inicializada.")
             return
 
-        print(f"\n🤖 Consultando Agente Catedral (zkAGI)...")
+        print("\n🤖 Consultando Agente Catedral (zkAGI)...")
         print(f"Pergunta: {prompt}\n")
 
         import urllib.request

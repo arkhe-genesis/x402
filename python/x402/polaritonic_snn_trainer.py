@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 # "polaritonic_snn_trainer.py" — Substrato 862.2
 # Treinamento de SNNs com neurônios cuja dinâmica simula condensados polaritônicos
-import numpy as np
-from scipy.integrate import solve_ivp
 import hashlib
+
+import numpy as np
+
 
 class PolaritonicNeuron:
     """Neurônio spiking cuja membrana segue a equação de Gross-Pitaevskii simplificada."""

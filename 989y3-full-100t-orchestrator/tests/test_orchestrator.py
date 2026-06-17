@@ -8,8 +8,8 @@ import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from full_100t_orchestrator import (
-    Full100TOrchestrator, InferenceJob, InferencePriority,
-    InferenceTarget, JobStatus, OrchestratorConfig, ModelMetrics,
+    Full100TOrchestrator, InferencePriority,
+    InferenceTarget, JobStatus,
 )
 
 @pytest.fixture

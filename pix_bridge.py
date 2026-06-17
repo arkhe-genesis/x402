@@ -27,16 +27,10 @@ Referências:
 import hashlib
 import json
 import logging
-import secrets
 import time
-import uuid
-import hmac
-import base64
-import re
-from dataclasses import dataclass, field, asdict
-from typing import Dict, List, Optional, Tuple, Any
+from dataclasses import dataclass, field
+from typing import Dict, Optional, Tuple, Any
 from enum import Enum
-from pathlib import Path
 
 # ============================================================================
 # CONSTANTES DO PIX BCB

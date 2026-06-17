@@ -14,7 +14,7 @@
 import numpy as np
 import math
 import secrets
-from typing import List, Tuple, Optional, Dict
+from typing import List, Tuple, Dict
 from dataclasses import dataclass
 from collections import deque
 
@@ -836,7 +836,7 @@ if __name__ == "__main__":
     lll_dream = LLLDreamOrganizer(delta=0.75)
     consolidated_dream = lll_dream.dream_cycle(dream_buffer, cycle_duration=90)
 
-    print(f"  Memórias de entrada: 90")
+    print("  Memórias de entrada: 90")
     print(f"  Memórias consolidadas: {len(consolidated_dream)}")
     print(f"  Fator de compressão: {90/len(consolidated_dream):.2f}x")
     print("  ✓ Ciclo de Sonho: PASS")

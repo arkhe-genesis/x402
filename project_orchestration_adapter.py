@@ -3,7 +3,7 @@
 # Adaptador para MS Project e Primavera
 import hashlib
 import xml.etree.ElementTree as ET
-from typing import Dict, List, Optional
+from typing import Dict, List
 from dataclasses import dataclass
 from enum import Enum
 

@@ -13,8 +13,7 @@
 import numpy as np
 import hashlib
 import secrets
-import os
-from typing import Tuple, List, Dict, Optional
+from typing import Tuple, List
 
 # ================================================================
 # CONSTANTES E PARÂMETROS NIST (FIPS 203 / FIPS 204)

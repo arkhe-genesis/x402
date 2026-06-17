@@ -4,8 +4,6 @@ Integração com o protocolo Intuition para armazenamento de atestados,
 identidade descentralizada e governança da floresta.
 """
 import logging
-import json
-from typing import Dict, List, Optional, Any
 from decimal import Decimal
 
 from web3 import Web3

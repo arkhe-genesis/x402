@@ -3,13 +3,8 @@
 # ARKHE-OS as Android Operating System
 # Full Android integration: AOSP, Jetpack Compose, Kotlin, ART
 
-import os
-import json
-import hashlib
-import subprocess
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, List
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
 
 # ═══════════════════════════════════════════════════════════════════
 # Android OS Configuration
@@ -805,7 +800,6 @@ class ArkheAndroidOS:
 
     def generate_project(self, output_dir: str = "arkhe-android") -> Dict:
         """Generate complete Android project."""
-        import os
 
         structure = {
             "manifest": self._generate_manifest(),
@@ -897,12 +891,12 @@ if __name__ == "__main__":
 
     # Generate project
     project = android_os.generate_project("arkhe-android")
-    print(f"\n📦 Project generated:")
+    print("\n📦 Project generated:")
     print(f"   Output dir: {project['output_dir']}")
     print(f"   Files: {project['files_count']}")
 
     # Show structure
-    print(f"\n📁 Structure:")
+    print("\n📁 Structure:")
     for category, files in project['structure'].items():
         print(f"   {category}: {len(files)} files")
         for fname in files:
@@ -910,7 +904,7 @@ if __name__ == "__main__":
 
     # Status
     status = android_os.get_status()
-    print(f"\n📊 Status:")
+    print("\n📊 Status:")
     for k, v in status.items():
         print(f"   {k}: {v}")
 

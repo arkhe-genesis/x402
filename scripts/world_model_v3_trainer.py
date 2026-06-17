@@ -1,6 +1,5 @@
 import requests
 import argparse
-import sys
 
 def fetch_prometheus_data(prometheus_url, query, start, end, step='60s'):
     resp = requests.get(f'{prometheus_url}/api/v1/query_range', params={

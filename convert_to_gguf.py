@@ -14,7 +14,6 @@ Uso:
 import argparse
 import torch
 import numpy as np
-from pathlib import Path
 
 def convert_checkpoint_to_gguf(input_path: str, output_path: str, quantization: str = "Q4_K_M"):
     """Converte checkpoint PyTorch para GGUF v3."""

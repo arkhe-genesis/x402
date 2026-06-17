@@ -8,10 +8,9 @@ Este cliente se comunica com o llama-server (porta 8080) e aplica
 as constraints canonicas ARKHE sobre as respostas.
 """
 
-import json
 import hashlib
 import requests
-from typing import Dict, List, Optional
+from typing import Dict, List
 from dataclasses import dataclass
 
 @dataclass

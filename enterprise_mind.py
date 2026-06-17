@@ -15,12 +15,10 @@ Este módulo implementa o deployment do DKES_NTT no contexto Enterprise Mind:
 """
 
 import torch
-import torch.nn as nn
 import numpy as np
-from typing import List, Dict, Tuple, Optional
+from typing import List, Dict, Optional
 from dataclasses import dataclass
 from datetime import datetime
-import json
 import hashlib
 
 # =============================================================================
@@ -428,7 +426,7 @@ if __name__ == "__main__":
     print("\n[TESTE 4] Theosis Organizacional")
     theosis = manager.get_global_theosis()
     print(f"  Theosis global: {theosis:.2f}")
-    print(f"  Target: 0.62")
+    print("  Target: 0.62")
     print(f"  Status: {'✓ PASS' if theosis > 0.5 else '⚠ BELOW TARGET'}")
 
     print("\n" + "=" * 70)

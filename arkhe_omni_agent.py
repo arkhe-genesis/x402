@@ -32,28 +32,18 @@ Princípio: A simplicidade é a sofisticação final. Um arquivo, uma verdade.
 
 import hashlib
 import hmac
-import json
 import logging
 import os
 import random
-import re
 import secrets
-import string
-import subprocess
-import tempfile
 import time
-import urllib.parse
-import urllib.request
-import uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 import numpy as np
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 
 # ── Logger ──────────────────────────────────────────────────────────────────────────
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
@@ -163,7 +153,7 @@ class EthereumMainnetBridge:
                 "etherscan_url": f"{self.ETHERSCAN_ADDRESS_URL}{address}",
                 "source": "etherscan_api",
             }
-        except Exception as e:
+        except Exception:
             return self._mock_verify(address)
 
     def _mock_verify(self, address: str) -> Dict:
@@ -335,14 +325,14 @@ class GoogleGroundingLayer:
             results.append({
                 "title": f"[GOOGLE] Result {i+1} for '{query[:40]}...'",
                 "link": f"https://{domain}/article/{seed[:8]}-{i}",
-                "snippet": f"Google result snippet for query...",
+                "snippet": "Google result snippet for query...",
             })
         return {"query": query, "results": results, "total_results": num_results}
 
     def synthesize_context(self, results: Dict, max_snippets: int = 3) -> str:
         if not results.get("results"):
             return ""
-        lines = [f"[WEB-GROUNDED CONTEXT | GOOGLE]"]
+        lines = ["[WEB-GROUNDED CONTEXT | GOOGLE]"]
         for i, r in enumerate(results["results"][:max_snippets]):
             lines.append(f"[{i+1}] {r.get('title', 'N/A')}")
             lines.append(f"    → {r.get('snippet', '')[:200]}")
@@ -527,7 +517,6 @@ class QuantumProofOfWork:
 # SUBSTRATE 1028: CATEDRAL COREUTILS
 # ═════════════════════════════════════════════════════════════════════════════════════
 
-import subprocess
 
 class CatedralCoreutilsBridge:
     """

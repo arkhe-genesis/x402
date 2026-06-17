@@ -14,7 +14,7 @@ Uso:
 import pytest
 import json
 import hashlib
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import Mock
 from pathlib import Path
 from datetime import datetime
 

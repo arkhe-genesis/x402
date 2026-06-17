@@ -13,12 +13,11 @@ import json
 import time
 import logging
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Callable, Any
+from typing import Dict, List, Optional, Callable
 from decimal import Decimal
 from urllib.parse import urljoin
 
 import aiohttp
-import web3
 from web3 import Web3
 from web3.middleware import ExtraDataToPOAMiddleware
 from eth_account import Account
@@ -324,7 +323,7 @@ class PaxosUSDGGateway:
                     self.usdg_balance.labels(type="total").set(float(bal.total))
                 self._last_balances[bal.currency] = bal
             return balances
-        except Exception as e:
+        except Exception:
             self.api_requests.labels(operation="get_balances", status="error").inc()
             raise
         finally:
@@ -365,7 +364,7 @@ class PaxosUSDGGateway:
             tx = await self.api.convert(from_currency, to_currency, amount)
             self.api_requests.labels(operation="convert", status="success").inc()
             return tx
-        except Exception as e:
+        except Exception:
             self.api_requests.labels(operation="convert", status="error").inc()
             raise
         finally:

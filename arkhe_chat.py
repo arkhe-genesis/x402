@@ -3,7 +3,6 @@
 CLI para interação local com o modelo ARKHE via llama.cpp
 """
 import sys
-import json
 import requests
 
 def chat():

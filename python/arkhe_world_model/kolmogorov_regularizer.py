@@ -35,7 +35,7 @@ Uso:
 
 import torch
 import torch.nn as nn
-from typing import Optional, Dict
+from typing import Dict
 
 
 def kolmogorov_regularizer(

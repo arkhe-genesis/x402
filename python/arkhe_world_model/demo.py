@@ -139,12 +139,12 @@ def demo_introspection(model: WorldModelEmbryo):
     report = model.self_model.introspect(fused_emb)
 
     print("\n  📋 Relatório de Auto-Modelagem:")
-    print(f"  ┌─────────────────────────────────────────────┐")
+    print("  ┌─────────────────────────────────────────────┐")
     print(f"  │ Confiança:           {report['confidence']:>20} │")
     print(f"  │ Incerteza:           {report['uncertainty_level']:>20} │")
     print(f"  │ Capacidades ativas:  {report['active_capabilities']:>20} │")
     print(f"  │ Auto-avaliação:      {report['self_assessment'][:40]:>20}... │")
-    print(f"  └─────────────────────────────────────────────┘")
+    print("  └─────────────────────────────────────────────┘")
 
     print("\n  📊 Scores de Capacidade:")
     for cap, score in report["capability_scores"].items():
@@ -160,7 +160,7 @@ def demo_introspection(model: WorldModelEmbryo):
 
     # Reflexão
     reflection = model.self_model.reflect()
-    print(f"\n  🪞 Reflexão:")
+    print("\n  🪞 Reflexão:")
     print(f"     Episódios: {reflection['n_episodes']}")
     print(f"     Outcome médio: {reflection['mean_outcome']:.3f}")
     print(f"     Tendência: {'↗' if reflection['trend'] > 0 else '↘' if reflection['trend'] < 0 else '→'} {reflection['trend']:+.3f}")

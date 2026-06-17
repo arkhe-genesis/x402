@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 # "biological_computing_bridge.py" — Substrato 859
 # Simulador de circuitos genéticos para ARKHE OS
+import hashlib
+
 import numpy as np
 from scipy.integrate import solve_ivp
-import hashlib
+
 
 class Repressilator:
     """

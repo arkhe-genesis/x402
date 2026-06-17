@@ -21,14 +21,14 @@ from mcp import ClientSession
 from mcp.client.sse import sse_client
 
 from x402 import x402ClientSync
-from x402.mechanisms.evm import EthAccountSigner
-from x402.mechanisms.evm.exact.register import register_exact_evm_client
 from x402.mcp import (
     AfterPaymentContext,
     MCPToolResult,
     PaymentRequiredContext,
     x402MCPClient,
 )
+from x402.mechanisms.evm import EthAccountSigner
+from x402.mechanisms.evm.exact.register import register_exact_evm_client
 
 load_dotenv()
 
