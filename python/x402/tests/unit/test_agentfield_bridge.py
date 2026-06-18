@@ -1,10 +1,12 @@
 import pytest
-import asyncio
+
 from x402.agentfield_bridge import ArkheAgentFieldBridge
+
 
 @pytest.fixture
 def bridge():
     return ArkheAgentFieldBridge(node_id="test-agent")
+
 
 @pytest.mark.asyncio
 async def test_bridge_ai_method(bridge):
@@ -19,8 +21,10 @@ async def test_bridge_ai_method(bridge):
     if bridge.orchestrator:
         assert result["job_id"].startswith("job-")
 
+
 def test_bridge_reasoner_decorator(bridge):
     """Test the @app.reasoner decorator."""
+
     @bridge.reasoner(tags=["test", "unit"])
     def dummy_func():
         return "ok"
@@ -28,6 +32,7 @@ def test_bridge_reasoner_decorator(bridge):
     assert hasattr(dummy_func, "_is_reasoner")
     assert dummy_func._is_reasoner is True
     assert dummy_func._reasoner_tags == ["test", "unit"]
+
 
 @pytest.mark.asyncio
 async def test_bridge_mocks(bridge):

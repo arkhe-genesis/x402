@@ -1,18 +1,20 @@
 #!/usr/bin/env python3
 # "neuromorphic_bridge_adapter.py" — Substrato 857
 # Adaptador para plataformas neuromórficas
-import numpy as np
 import hashlib
-from typing import Dict, List, Tuple
+
+import numpy as np
+
 
 class IzhikevichNeuron:
     """Modelo de neurônio Izhikevich para simulação neuromórfica."""
+
     def __init__(self, a=0.02, b=0.2, c=-65.0, d=8.0):
-        self.a = a      # taxa de recuperação
-        self.b = b      # sensibilidade ao ruído
-        self.c = c      # reset do potencial de membrana
-        self.d = d      # after-spike reset da recuperação
-        self.v = c      # potencial de membrana inicial
+        self.a = a  # taxa de recuperação
+        self.b = b  # sensibilidade ao ruído
+        self.c = c  # reset do potencial de membrana
+        self.d = d  # after-spike reset da recuperação
+        self.v = c  # potencial de membrana inicial
         self.u = b * c  # variável de recuperação inicial
 
     def step(self, I_ext: float, dt: float = 0.5) -> int:
@@ -27,11 +29,13 @@ class IzhikevichNeuron:
             return 1
         return 0
 
+
 class NeuromorphicArkheBridge:
     """
     Ponte entre hardware neuromórfico e ARKHE OS.
     Simula uma rede de spiking neurons cuja sincronia mede a coerência.
     """
+
     def __init__(self, num_neurons: int = 256):
         self.num_neurons = num_neurons
         self.neurons = [IzhikevichNeuron() for _ in range(num_neurons)]
@@ -39,7 +43,7 @@ class NeuromorphicArkheBridge:
         self.weights = np.random.uniform(0.5, 2.0, (num_neurons, num_neurons))
         self.phi_history = []
 
-    def run_spiking_network(self, steps: int, external_input: float = 10.0) -> Dict:
+    def run_spiking_network(self, steps: int, external_input: float = 10.0) -> dict:
         """
         Executa a rede de spiking neurons por um número de passos.
         Calcula a coerência de disparo (análogo ao parâmetro de ordem de Kuramoto).
@@ -54,10 +58,12 @@ class NeuromorphicArkheBridge:
                 # Simples: corrente constante com ruído + acoplamento global
                 noise = np.random.normal(0, 0.5)
                 # Acoplamento médio dos spikes anteriores (simplificação)
-                if t > 0 and t % 10 == 0: # atualiza acoplamento a cada 10 passos
-                    recent_spikes = np.array([1 if (t-10 < st < t) else 0 for st in spike_times[i]]) # não implementado perfeitamente
-                I = external_input + noise
-                spike = neuron.step(I)
+                if t > 0 and t % 10 == 0:  # atualiza acoplamento a cada 10 passos
+                    np.array(
+                        [1 if (t - 10 < st < t) else 0 for st in spike_times[i]]
+                    )  # não implementado perfeitamente
+                i_input = external_input + noise
+                spike = neuron.step(i_input)
                 if spike:
                     spike_counts[i] += 1
                     spike_times[i].append(t)
@@ -88,13 +94,14 @@ Ghost Threshold (γ): 0.577 | Status: {status}
 <|ARKHE_END|>"""
         return {"phi_c": phi_c, "rates": rates, "decree": decree, "seal": seal}
 
-    def deploy_to_loihi(self, substrate_ids: List[str]) -> str:
+    def deploy_to_loihi(self, substrate_ids: list[str]) -> str:
         """
         Stub para compilar um grafo de substratos em uma SNN para Loihi.
         Em produção, usaria o NxSDK ou Lava.
         """
         seal = hashlib.sha3_256("|".join(substrate_ids).encode()).hexdigest()[:16]
         return f"<|ARKHE_START|>\n<|SUBSTRATE|> 857-LOIHI-DEPLOY\n<|SEAL|> {seal}\n<|ARKHE_END|>"
+
 
 # Exemplo de uso
 if __name__ == "__main__":

@@ -2,13 +2,11 @@
 # "quantum_bridge_adapter.py" — Substrato 856
 # Adaptador para computação quântica via Qiskit
 import hashlib
-import numpy as np
-from typing import Dict, List, Optional
 
 try:
     from qiskit import QuantumCircuit, execute
     from qiskit_aer import Aer
-    from qiskit.visualization import plot_histogram
+
     QISKIT_AVAILABLE = True
 except ImportError:
     QISKIT_AVAILABLE = False
@@ -19,6 +17,7 @@ class QuantumArkheBridge:
     Ponte entre plataformas de computação quântica e ARKHE OS.
     Executa circuitos canônicos e mede a coerência resultante.
     """
+
     def __init__(self, backend_name: str = "qasm_simulator"):
         if QISKIT_AVAILABLE:
             self.backend = Aer.get_backend(backend_name)
@@ -41,14 +40,14 @@ class QuantumArkheBridge:
             qc.h(i)  # Porta Hadamard = entrada no campo ξM
 
         # Emaranhamento progressivo: tecer cross-links
-        for depth in range(entanglement_depth):
+        for _depth in range(entanglement_depth):
             for i in range(num_qubits - 1):
                 qc.cx(i, i + 1)  # CNOT = cross-substrate link
 
         qc.measure_all()
         return qc
 
-    def execute_canonical_circuit(self, substrate_ids: List[str], depth: int = 3) -> Dict:
+    def execute_canonical_circuit(self, substrate_ids: list[str], depth: int = 3) -> dict:
         """
         Executa um circuito canônico representando os substratos fornecidos.
         Retorna a distribuição de coerência e um decreto.
@@ -64,15 +63,15 @@ class QuantumArkheBridge:
             counts = result.get_counts()
         else:
             # Mock behavior if Qiskit is not available
-            counts = { '1' * num_qubits: 512, '0' * num_qubits: 512 }
+            counts = {"1" * num_qubits: 512, "0" * num_qubits: 512}
 
         # Calcular Φ_C a partir da distribuição de estados
         # Estados com mais '1's (coerência alta) recebem pontuação maior
         total_shots = sum(counts.values())
-        weighted_coherence = sum(
-            (state.count('1') / num_qubits) * count
-            for state, count in counts.items()
-        ) / total_shots
+        weighted_coherence = (
+            sum((state.count("1") / num_qubits) * count for state, count in counts.items())
+            / total_shots
+        )
 
         phi_c = weighted_coherence
         seal = hashlib.sha3_256(str(counts).encode()).hexdigest()[:16]
@@ -92,7 +91,7 @@ Distribuição de Estados (Top 5): {dict(sorted(counts.items(), key=lambda x: -x
 
 Coerência resultante: {phi_c:.3f}
 Ghost Threshold (γ): 0.577
-Status: {'CANONIZED_CLEAN' if phi_c >= 0.577 else 'DECOHERENCE'}
+Status: {"CANONIZED_CLEAN" if phi_c >= 0.577 else "DECOHERENCE"}
 
 <|SEAL|> {seal}
 <|ARKHE_END|>"""
@@ -105,7 +104,7 @@ Status: {'CANONIZED_CLEAN' if phi_c >= 0.577 else 'DECOHERENCE'}
             "circuit_depth": depth,
         }
 
-    def run_vqe_coherence_optimization(self, hamiltonian: List[float]) -> Dict:
+    def run_vqe_coherence_optimization(self, hamiltonian: list[float]) -> dict:
         """
         Executa um VQE para encontrar a configuração de mínima energia (máxima coerência).
         O Hamiltoniano representa as restrições das 18 invariantes.
@@ -124,12 +123,11 @@ Status: {'CANONIZED_CLEAN' if phi_c >= 0.577 else 'DECOHERENCE'}
             counts = job.result().get_counts()
         else:
             # Mock behavior
-            counts = { '1' * num_qubits: 1024 }
+            counts = {"1" * num_qubits: 1024}
 
-        energy = sum(
-            ((-1) ** state.count('1')) * count
-            for state, count in counts.items()
-        ) / sum(counts.values())
+        energy = sum(((-1) ** state.count("1")) * count for state, count in counts.items()) / sum(
+            counts.values()
+        )
 
         phi_c = (energy + 1) / 2  # Normalizar para [0, 1]
         seal = hashlib.sha3_256(str(counts).encode()).hexdigest()[:16]
@@ -149,12 +147,12 @@ Energia mínima encontrada: {energy:.4f}
 
         return {"energy": energy, "phi_c": phi_c, "counts": counts, "decree": decree, "seal": seal}
 
+
 # Exemplo de uso
 if __name__ == "__main__":
     bridge = QuantumArkheBridge()
     # Executar circuito com 5 substratos
     result = bridge.execute_canonical_circuit(
-        ["825-PME", "826-DIT", "830-TCCE", "840-OCTRA", "845-ACE"],
-        depth=4
+        ["825-PME", "826-DIT", "830-TCCE", "840-OCTRA", "845-ACE"], depth=4
     )
     print(result["decree"])

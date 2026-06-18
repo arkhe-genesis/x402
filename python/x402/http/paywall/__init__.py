@@ -39,6 +39,7 @@ from ..utils import htmlsafe_json_dumps
 
 if TYPE_CHECKING:
     from x402.schemas import PaymentRequired
+
     from ..types import PaywallConfig
 
 

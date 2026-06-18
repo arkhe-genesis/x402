@@ -7,6 +7,7 @@ from collections.abc import Awaitable, Callable
 from typing import Any
 
 from x402.schemas import PaymentPayload, PaymentRequired
+
 from .types import (
     AfterPaymentContext,
     MCPToolCallResult,

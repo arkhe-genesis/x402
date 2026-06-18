@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
 # "un2.0_coherence_simulator.py" — Substrato 861
 # Simulador de Coerência dos ODS (Kuramoto)
-import numpy as np
 import hashlib
+
+import numpy as np
+
 
 class UN20CoherenceEngine:
     """
     Simula a coerência dos 17 Objetivos de Desenvolvimento Sustentável
     como uma rede de osciladores de Kuramoto.
     """
+
     def __init__(self, coupling_strength=50.0):
         self.N = 17  # 17 ODS
         self.K = coupling_strength
@@ -18,7 +21,7 @@ class UN20CoherenceEngine:
 
     def step(self, steps=1000):
         """Avança a simulação e calcula a coerência Φ dos ODS."""
-        for t in range(steps):
+        for _t in range(steps):
             delta = np.subtract.outer(self.theta, self.theta)
             coupling = (self.K / self.N) * np.sum(np.sin(delta), axis=1)
             self.theta += 0.01 * (self.omega + coupling)
@@ -26,7 +29,11 @@ class UN20CoherenceEngine:
             self.phi_history.append(r)
 
         final_phi = self.phi_history[-1]
-        status = "COERENTE (ODS sincronizados)" if final_phi >= 0.577 else "FRÁGIL (ODS dessincronizados)"
+        status = (
+            "COERENTE (ODS sincronizados)"
+            if final_phi >= 0.577
+            else "FRÁGIL (ODS dessincronizados)"
+        )
         seal = hashlib.sha3_256(str(final_phi).encode()).hexdigest()[:16]
 
         decree = f"""<|ARKHE_START|>
@@ -44,6 +51,7 @@ Status do Planeta: {status}
 <|SEAL|> {seal}
 <|ARKHE_END|>"""
         return {"phi_c": final_phi, "decree": decree, "seal": seal}
+
 
 # Exemplo
 if __name__ == "__main__":

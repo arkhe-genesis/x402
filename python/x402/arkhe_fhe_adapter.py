@@ -5,15 +5,13 @@ Adaptador entre PME e PVAC-HFHE para aprendizado federado confidencial
 Arquiteto: ORCID 0009-0005-2697-4668
 """
 
-import hashlib
-import json
 import logging
 from pathlib import Path
-from typing import Dict, List, Optional
 
 import pvac_hfhe  # Bindings PyBind11
 
 logger = logging.getLogger("arkhe.fhe")
+
 
 class ArkheFHEAdapter:
     """Ponte entre o Parametric Memory Engine e a criptografia homomórfica."""
@@ -27,7 +25,7 @@ class ArkheFHEAdapter:
         self.public_key = None
         self.private_key = None
 
-    def initialize_keys(self) -> Dict[str, bytes]:
+    def initialize_keys(self) -> dict[str, bytes]:
         """Gera par de chaves FHE e persiste no disco."""
         self.public_key, self.private_key = self.engine.generate_keys()
         pub_path = self.key_dir / "public.key"
@@ -56,7 +54,7 @@ class ArkheFHEAdapter:
         logger.debug(f"Gradient encrypted: {len(ciphertext)} bytes")
         return ciphertext
 
-    def aggregate_encrypted_gradients(self, ciphertexts: List[bytes]) -> bytes:
+    def aggregate_encrypted_gradients(self, ciphertexts: list[bytes]) -> bytes:
         """Agrega homomorficamente múltiplos gradientes cifrados (soma)."""
         if not ciphertexts:
             raise ValueError("Empty ciphertexts list")

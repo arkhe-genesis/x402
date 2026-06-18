@@ -3,12 +3,19 @@
 # Proxy que intercepta chamadas de ferramentas do assistente de IA e bloqueia ações perigosas
 import re
 
+
 class AIProxyGuard:
     def __init__(self):
         self.blocked_commands = [
-            r"cat \.ssh", r"cat \.aws", r"cat \.config", r"git credential",
-            r"npm publish", r"pip install", r"cargo publish",
-            r"curl.*\|.*sh", r"wget.*\|.*sh",
+            r"cat \.ssh",
+            r"cat \.aws",
+            r"cat \.config",
+            r"git credential",
+            r"npm publish",
+            r"pip install",
+            r"cargo publish",
+            r"curl.*\|.*sh",
+            r"wget.*\|.*sh",
         ]
         self.blocked_tools = ["run_terminal_cmd", "execute_command", "shell"]
 
@@ -21,6 +28,7 @@ class AIProxyGuard:
                     print(alert)
                     return {"error": "Blocked by ARKHE SecOps"}
         return None
+
 
 # Exemplo
 if __name__ == "__main__":

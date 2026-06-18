@@ -6,12 +6,11 @@
 ╚══════════════════════════════════════════════════════════════════════════════╝
 """
 
-import socket
-import random
 import asyncio
-from typing import Dict, List, Optional, Callable
+import random
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from collections import deque
+
 
 @dataclass
 class DNSRecord:
@@ -20,18 +19,19 @@ class DNSRecord:
     ttl: int = 300
     record_type: str = "A"
 
+
 class DNSResolver:
     """Simulação de resolver DNS com cache."""
 
     def __init__(self):
-        self.cache: Dict[str, DNSRecord] = {}
-        self.authoritative: Dict[str, str] = {
+        self.cache: dict[str, DNSRecord] = {}
+        self.authoritative: dict[str, str] = {
             "arkhe.io": "104.21.45.100",
             "arkhe-g.arkhe.io": "104.21.45.101",
             "arkhe-871.arkhe.io": "104.21.45.102",
         }
 
-    def resolve(self, domain: str) -> Optional[str]:
+    def resolve(self, domain: str) -> str | None:
         if domain in self.cache:
             return self.cache[domain].ip
         if domain in self.authoritative:
@@ -43,18 +43,21 @@ class DNSResolver:
     def invalidate_cache(self, domain: str):
         self.cache.pop(domain, None)
 
+
 @dataclass
 class HTTPRequest:
     method: str
     path: str
-    headers: Dict[str, str] = field(default_factory=dict)
+    headers: dict[str, str] = field(default_factory=dict)
     body: str = ""
+
 
 @dataclass
 class HTTPResponse:
     status: int
-    headers: Dict[str, str] = field(default_factory=dict)
+    headers: dict[str, str] = field(default_factory=dict)
     body: str = ""
+
 
 class HTTPServer:
     """Servidor HTTP/HTTPS simulado."""
@@ -62,13 +65,14 @@ class HTTPServer:
     def __init__(self, host: str = "0.0.0.0", port: int = 8080):
         self.host = host
         self.port = port
-        self.routes: Dict[str, Callable] = {}
+        self.routes: dict[str, Callable] = {}
         self.tls_enabled = True
 
     def route(self, path: str):
         def decorator(func):
             self.routes[path] = func
             return func
+
         return decorator
 
     def handle(self, request: HTTPRequest) -> HTTPResponse:
@@ -77,17 +81,18 @@ class HTTPServer:
             return handler(request)
         return HTTPResponse(404, body="Not Found")
 
+
 class LoadBalancer:
     """Load Balancer com múltiplos algoritmos."""
 
-    def __init__(self, backends: List[str], algorithm: str = "round_robin"):
+    def __init__(self, backends: list[str], algorithm: str = "round_robin"):
         self.backends = backends
         self.algorithm = algorithm
         self.current_index = 0
         self.weights = [1.0] * len(backends)
-        self.health_status = {b: True for b in backends}
+        self.health_status = dict.fromkeys(backends, True)
 
-    def get_backend(self) -> Optional[str]:
+    def get_backend(self) -> str | None:
         healthy = [b for b in self.backends if self.health_status[b]]
         if not healthy:
             return None
@@ -115,6 +120,7 @@ class LoadBalancer:
         for backend in self.backends:
             self.health_status[backend] = random.random() > 0.1
 
+
 class ReverseProxy:
     """Reverse Proxy com rate limiting e SSL termination."""
 
@@ -136,15 +142,15 @@ class ReverseProxy:
         if not backend:
             return HTTPResponse(503, body="No healthy backends")
 
-        return HTTPResponse(200, headers={"X-Backend": backend},
-                          body=f"Proxied to {backend}")
+        return HTTPResponse(200, headers={"X-Backend": backend}, body=f"Proxied to {backend}")
+
 
 class WebSocketManager:
     """Gerenciador de conexões WebSocket."""
 
     def __init__(self):
-        self.connections: Dict[str, asyncio.Queue] = {}
-        self.subscriptions: Dict[str, List[str]] = {}
+        self.connections: dict[str, asyncio.Queue] = {}
+        self.subscriptions: dict[str, list[str]] = {}
 
     def connect(self, client_id: str):
         self.connections[client_id] = asyncio.Queue()
@@ -158,13 +164,14 @@ class WebSocketManager:
         for client_id in self.subscriptions.get(channel, []):
             await self.connections[client_id].put(message)
 
+
 if __name__ == "__main__":
     dns = DNSResolver()
     print(f"[DNS] arkhe.io -> {dns.resolve('arkhe.io')}")
 
     lb = LoadBalancer(["backend-1:8080", "backend-2:8080", "backend-3:8080"], "round_robin")
     for i in range(6):
-        print(f"[LB] Request {i+1} -> {lb.get_backend()}")
+        print(f"[LB] Request {i + 1} -> {lb.get_backend()}")
 
     proxy = ReverseProxy(lb)
     req = HTTPRequest("GET", "/api/data")

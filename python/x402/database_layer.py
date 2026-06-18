@@ -8,15 +8,15 @@
 
 import hashlib
 import random
-from typing import Dict, List, Optional, Any
-from dataclasses import dataclass, field
 from collections import defaultdict
+from typing import Any
+
 
 class ACIDTransaction:
     """Simulação de transação ACID."""
 
     def __init__(self):
-        self.log: List[Dict] = []
+        self.log: list[dict] = []
         self.committed = False
 
     def begin(self):
@@ -31,22 +31,23 @@ class ACIDTransaction:
         try:
             self.committed = True
             return True
-        except:
+        except Exception:
             self.rollback()
             return False
 
     def rollback(self):
-        for entry in reversed(self.log):
+        for _entry in reversed(self.log):
             # Restore old values
             pass
         self.committed = False
+
 
 class ShardManager:
     """Gerenciador de sharding consistente."""
 
     def __init__(self, n_shards: int = 4):
         self.n_shards = n_shards
-        self.shards: Dict[int, Dict] = {i: {} for i in range(n_shards)}
+        self.shards: dict[int, dict] = {i: {} for i in range(n_shards)}
 
     def _get_shard(self, key: str) -> int:
         """Consistent hashing para determinar shard."""
@@ -56,7 +57,7 @@ class ShardManager:
         shard = self._get_shard(key)
         self.shards[shard][key] = value
 
-    def get(self, key: str) -> Optional[Any]:
+    def get(self, key: str) -> Any | None:
         shard = self._get_shard(key)
         return self.shards[shard].get(key)
 
@@ -70,13 +71,14 @@ class ShardManager:
         for key, value in all_data.items():
             self.put(key, value)
 
+
 class ReplicationManager:
     """Gerenciador de replicação master-slave."""
 
-    def __init__(self, master: str, slaves: List[str]):
+    def __init__(self, master: str, slaves: list[str]):
         self.master = master
         self.slaves = slaves
-        self.replication_lag: Dict[str, float] = {s: 0.0 for s in slaves}
+        self.replication_lag: dict[str, float] = dict.fromkeys(slaves, 0.0)
 
     def write(self, key: str, value: Any) -> bool:
         # Write to master
@@ -86,7 +88,7 @@ class ReplicationManager:
             self.replication_lag[slave] += random.uniform(0.001, 0.1)
         return success
 
-    def read(self, key: str, consistency: str = "eventual") -> Optional[Any]:
+    def read(self, key: str, consistency: str = "eventual") -> Any | None:
         if consistency == "strong":
             # Read from master
             return f"value_from_{self.master}"
@@ -95,11 +97,12 @@ class ReplicationManager:
             nearest = min(self.slaves, key=lambda s: self.replication_lag[s])
             return f"value_from_{nearest}"
 
+
 class IndexManager:
     """Gerenciador de índices B-Tree simplificado."""
 
     def __init__(self):
-        self.indexes: Dict[str, Dict] = defaultdict(dict)
+        self.indexes: dict[str, dict] = defaultdict(dict)
 
     def create_index(self, table: str, column: str):
         self.indexes[f"{table}.{column}"] = {}
@@ -110,8 +113,9 @@ class IndexManager:
             self.indexes[key][value] = []
         self.indexes[key][value].append(row_id)
 
-    def query_index(self, table: str, column: str, value: Any) -> List[int]:
+    def query_index(self, table: str, column: str, value: Any) -> list[int]:
         return self.indexes.get(f"{table}.{column}", {}).get(value, [])
+
 
 if __name__ == "__main__":
     # Test ACID

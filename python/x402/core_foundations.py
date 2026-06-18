@@ -7,22 +7,23 @@
 ╚══════════════════════════════════════════════════════════════════════════════╝
 """
 
-import asyncio
 import random
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Callable
-from enum import Enum
 from datetime import datetime
+from enum import Enum
+
 
 class ScalingMode(Enum):
     HORIZONTAL = "horizontal"
     VERTICAL = "vertical"
+
 
 class ArchitecturePattern(Enum):
     MONOLITH = "monolith"
     MICROSERVICES = "microservices"
     SERVERLESS = "serverless"
     EDGE = "edge"
+
 
 @dataclass
 class SystemNode:
@@ -35,17 +36,18 @@ class SystemNode:
     def utilization(self) -> float:
         return self.load / self.capacity if self.capacity > 0 else 1.0
 
+
 class CAPTheorem:
     """Simulação do Teorema CAP: Consistency, Availability, Partition Tolerance."""
 
     def __init__(self, preference: str = "CP"):
         self.preference = preference  # CP, AP, or CA (impossible in distributed)
-        self.partitions: List[List[SystemNode]] = []
+        self.partitions: list[list[SystemNode]] = []
 
-    def simulate_partition(self, nodes: List[SystemNode], partition_indices: List[int]):
+    def simulate_partition(self, nodes: list[SystemNode], partition_indices: list[int]):
         """Simula uma partição de rede e aplica a preferência CAP."""
         partition_a = [n for i, n in enumerate(nodes) if i in partition_indices]
-        partition_b = [n for i, n in enumerate(nodes) if i not in partition_indices]
+        [n for i, n in enumerate(nodes) if i not in partition_indices]
 
         if self.preference == "CP":
             # Sacrifica disponibilidade para manter consistência
@@ -58,19 +60,20 @@ class CAPTheorem:
         else:
             return {"error": "CA impossible in distributed systems"}
 
+
 class SelfHealingSystem:
     """Sistema auto-curativo com detecção de falhas e recuperação."""
 
-    def __init__(self, nodes: List[SystemNode]):
+    def __init__(self, nodes: list[SystemNode]):
         self.nodes = nodes
-        self.failure_history: List[Dict] = []
+        self.failure_history: list[dict] = []
 
-    def detect_failures(self) -> List[SystemNode]:
+    def detect_failures(self) -> list[SystemNode]:
         """Detecta nós com utilização > 90% ou marcados como unhealthy."""
         failed = [n for n in self.nodes if n.utilization > 0.9 or not n.healthy]
         return failed
 
-    def heal(self, strategy: str = "restart") -> Dict:
+    def heal(self, strategy: str = "restart") -> dict:
         """Aplica estratégia de cura aos nós falhos."""
         failed = self.detect_failures()
         healed_count = 0
@@ -87,19 +90,22 @@ class SelfHealingSystem:
                 self.nodes.remove(node)
                 healed_count += 1
 
-        self.failure_history.append({
-            "timestamp": str(datetime.now()),
-            "failed": len(failed),
-            "healed": healed_count,
-            "strategy": strategy
-        })
+        self.failure_history.append(
+            {
+                "timestamp": str(datetime.now()),
+                "failed": len(failed),
+                "healed": healed_count,
+                "strategy": strategy,
+            }
+        )
 
         return {"healed": healed_count, "total_nodes": len(self.nodes), "strategy": strategy}
+
 
 class AINativeScheduler:
     """Scheduler AI-native para alocação de recursos."""
 
-    def __init__(self, nodes: List[SystemNode]):
+    def __init__(self, nodes: list[SystemNode]):
         self.nodes = nodes
         self.predictive_model = {}  # Simplified: load prediction
 
@@ -110,7 +116,7 @@ class AINativeScheduler:
         predicted = node.utilization + trend * horizon_minutes
         return max(0.0, min(1.0, predicted))
 
-    def schedule(self, task_load: float) -> Optional[SystemNode]:
+    def schedule(self, task_load: float) -> SystemNode | None:
         """Aloca tarefa ao nó com menor utilização prevista."""
         predictions = [(n, self.predict_load(n.id)) for n in self.nodes if n.healthy]
         if not predictions:
@@ -118,6 +124,7 @@ class AINativeScheduler:
         best_node = min(predictions, key=lambda x: x[1])[0]
         best_node.load += task_load
         return best_node
+
 
 if __name__ == "__main__":
     nodes = [SystemNode(f"node-{i}", capacity=100.0) for i in range(5)]
@@ -138,4 +145,4 @@ if __name__ == "__main__":
     scheduler = AINativeScheduler(nodes)
     for i in range(10):
         node = scheduler.schedule(task_load=random.uniform(5, 20))
-        print(f"[Scheduler] Task {i+1} -> {node.id} (util: {node.utilization:.2%})")
+        print(f"[Scheduler] Task {i + 1} -> {node.id} (util: {node.utilization:.2%})")

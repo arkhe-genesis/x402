@@ -1,13 +1,16 @@
 #!/usr/bin/env python3
 # "polariton_simulator.py" — Substrato 862
-import numpy as np
 import hashlib
+
+import numpy as np
+
 
 class PolaritonCondensate:
     """
     Simula um condensado de polaritons como N osciladores coerentes.
     Ref: "Kuramoto model with pump and decay".
     """
+
     def __init__(self, N=64, pump_strength=1.5, coupling=100.0):
         self.N = N
         self.K = coupling
@@ -20,7 +23,7 @@ class PolaritonCondensate:
     def step(self, steps=2000):
         """Simula a dinâmica e mede a coerência do condensado."""
         dt = 0.01
-        for t in range(steps):
+        for _t in range(steps):
             # Interação Kuramoto
             delta = np.subtract.outer(self.theta, self.theta)
             coupling = (self.K / self.N) * np.sum(np.sin(delta), axis=1)
@@ -31,7 +34,7 @@ class PolaritonCondensate:
             self.rho += d_rho
             self.theta += d_theta
             # Manter theta em [0, 2pi)
-            self.theta %= (2 * np.pi)
+            self.theta %= 2 * np.pi
 
         # Calcular parâmetro de ordem ponderado pelas amplitudes
         z = self.rho * np.exp(1j * self.theta)
@@ -53,6 +56,7 @@ Status: {status}
 <|SEAL|> {seal}
 <|ARKHE_END|>"""
         return {"phi_c": phi_c, "decree": decree, "seal": seal}
+
 
 # Exemplo
 if __name__ == "__main__":
