@@ -33,6 +33,7 @@ from collections.abc import Callable
 from typing import Any
 
 from x402.schemas.payments import PaymentPayload, PaymentRequirements, ResourceInfo
+
 from .constants import MCP_PAYMENT_META_KEY, MCP_PAYMENT_RESPONSE_META_KEY
 from .types import (
     AfterExecutionContext,

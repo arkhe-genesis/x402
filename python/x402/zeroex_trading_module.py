@@ -1,5 +1,6 @@
+
 import aiohttp
-from typing import Optional
+
 
 class ZeroExTradingModule:
     def __init__(self, api_key: str, chain_id: int, wallet_address: str, zvec_memory, world_model=None):
@@ -11,7 +12,7 @@ class ZeroExTradingModule:
         self.base_url = "https://api.0x.org/swap/allowance-holder"
         self.session = None
 
-    async def execute_swap(self, sell_token: str, buy_token: str, sell_amount: int, slippage_bps: int = 100) -> Optional[dict]:
+    async def execute_swap(self, sell_token: str, buy_token: str, sell_amount: int, slippage_bps: int = 100) -> dict | None:
         """
         Executa um swap via 0x Swap API v2.
         Inclui validação de segurança e persistência de memória.
@@ -45,7 +46,7 @@ class ZeroExTradingModule:
             "sellAmount": sell_amount,
         }
         async with self.session.get(f"{self.base_url}/approval", params=allowance_params, headers=headers) as resp:
-            approval = await resp.json()
+            await resp.json()
 
         # 3. Submissão da Transação (simplificado)
         tx_hash = await self._send_transaction(quote.get("transaction", {}))

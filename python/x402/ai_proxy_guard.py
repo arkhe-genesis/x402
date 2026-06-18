@@ -3,6 +3,7 @@
 # Proxy que intercepta chamadas de ferramentas do assistente de IA e bloqueia ações perigosas
 import re
 
+
 class AIProxyGuard:
     def __init__(self):
         self.blocked_commands = [

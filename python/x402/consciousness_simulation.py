@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 # "consciousness_simulation.py" — Substrato 860
 # Calculador de Φ (IIT simplificado) para o campo ξM
-import numpy as np
 import hashlib
+
+import numpy as np
+
 
 def integrated_information(phi_history, gamma=0.577):
     """
@@ -38,7 +40,7 @@ class ConsciousnessSimulator:
 
     def step(self, steps=1000):
         """Simula a rede de Kuramoto e avalia a consciência."""
-        for t in range(steps):
+        for _t in range(steps):
             delta = np.subtract.outer(self.theta, self.theta)
             coupling = (self.K/self.num_nodes) * np.sum(np.sin(delta), axis=1)
             self.theta += 0.01*(self.omega + coupling)

@@ -1,7 +1,8 @@
-import sys
-import os
 import asyncio
-from typing import Any, Callable, Dict, List, Optional
+import os
+import sys
+from collections.abc import Callable
+from typing import Any
 
 # Add orchestrator to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../989y3-full-100t-orchestrator")))
@@ -24,7 +25,7 @@ class ArkheAgentFieldBridge:
     - governance/DIDs -> Passport-Gateway (989.x) + Axiarchy (954).
     """
 
-    def __init__(self, node_id: str, version: str = "1.0.0", ai_config: Optional[Dict] = None):
+    def __init__(self, node_id: str, version: str = "1.0.0", ai_config: dict | None = None):
         self.node_id = node_id
         self.version = version
         self.ai_config = ai_config or {}
@@ -43,7 +44,7 @@ class ArkheAgentFieldBridge:
             await self.orchestrator.run(max_concurrent=8)
             self._orchestrator_started = True
 
-    def reasoner(self, tags: List[str] = None):
+    def reasoner(self, tags: list[str] = None):
         """
         AgentField-compatible @app.reasoner decorator.
         Maps to OmniAgent (939) conceptually.
@@ -101,7 +102,7 @@ class ArkheAgentFieldBridge:
         print(f"Agent {self.node_id} pausing for approval via {approval_request_url}")
         return True
 
-    async def call(self, agent_func: str, input: Dict):
+    async def call(self, agent_func: str, input: dict):
         """
         AgentField-compatible cross-agent call.
         """

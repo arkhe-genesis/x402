@@ -12,6 +12,7 @@ from x402.schemas import (
     SettleResponse,
 )
 from x402.schemas.v1 import PaymentPayloadV1, PaymentRequiredV1
+
 from .constants import PAYMENT_REQUIRED_HEADER, X_PAYMENT_HEADER
 
 

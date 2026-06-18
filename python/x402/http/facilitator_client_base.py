@@ -18,6 +18,7 @@ from x402.schemas import (
     VerifyResponse,
 )
 from x402.schemas.v1 import PaymentPayloadV1, PaymentRequirementsV1
+
 from .constants import DEFAULT_FACILITATOR_URL
 
 if TYPE_CHECKING:

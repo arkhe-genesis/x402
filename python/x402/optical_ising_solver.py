@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 # "optical_ising_solver.py" — Substrato 862.3
 # Simulação de máquina de Ising óptica usando um condensado de polaritons
-import numpy as np
 import hashlib
+
+import numpy as np
+
 
 class OpticalIsingMachine:
     """

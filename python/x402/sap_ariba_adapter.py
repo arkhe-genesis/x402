@@ -2,9 +2,9 @@
 # "sap_ariba_adapter.py" — Substrato 853
 # Adaptador para SAP S/4HANA e Ariba via RFC/OData
 import hashlib
-from typing import Dict, List, Optional
-from dataclasses import dataclass
+
 from pyrfc import Connection
+
 
 class SAPArkheAdapter:
     """
@@ -15,14 +15,14 @@ class SAPArkheAdapter:
         self.conn = Connection(**conn_config)
         self.substrate_registry = {}
 
-    def read_financial_document(self, doc_number: str, company_code: str, fiscal_year: str) -> Dict:
+    def read_financial_document(self, doc_number: str, company_code: str, fiscal_year: str) -> dict:
         """Lê um documento financeiro via BAPI e o converte em substrato."""
         # Chamada BAPI para ler cabeçalho do documento
         result = self.conn.call('BAPI_ACC_DOCUMENT_RECORD',
                                 DOCUMENT_NUMBER=doc_number,
                                 COMPANY_CODE=company_code,
                                 FISCAL_YEAR=fiscal_year)
-        header = result.get('HEADER', {})
+        result.get('HEADER', {})
         items = result.get('ITEMS', [])
 
         # Mapear saldo para Φ_C (ex.: se saldo > 0, coerência alta)
@@ -43,7 +43,7 @@ Total: {total_amount:.2f}
 <|ARKHE_END|>"""
         return {"substrate_id": f"853-FI-{doc_number}", "phi_c": phi_c, "decree": decree, "seal": seal}
 
-    def fetch_ariba_suppliers(self, realm: str) -> List[Dict]:
+    def fetch_ariba_suppliers(self, realm: str) -> list[dict]:
         """Recupera fornecedores da Ariba Network via API OData e os registra como peers."""
         # Exemplo de requisição OData à Ariba
         # suppliers = requests.get(f"{ariba_base}/api/v1/suppliers", headers=auth).json()

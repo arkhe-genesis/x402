@@ -3,9 +3,9 @@
 # Adaptador para MS Project e Primavera
 import hashlib
 import xml.etree.ElementTree as ET
-from typing import Dict, List, Optional
 from dataclasses import dataclass
 from enum import Enum
+
 
 class ProjectStatus(Enum):
     ON_TRACK = "CANONIZED_CLEAN"
@@ -19,8 +19,8 @@ class ProjectTask:
     start: str
     finish: str
     percent_complete: int
-    predecessors: List[int]
-    successors: List[int]
+    predecessors: list[int]
+    successors: list[int]
 
 class ProjectOrchestrationAdapter:
     """
@@ -28,10 +28,10 @@ class ProjectOrchestrationAdapter:
     Converte cronogramas em Substratos e aplica o Ghost Threshold ao progresso.
     """
     def __init__(self):
-        self.tasks: Dict[int, ProjectTask] = {}
-        self.critical_path: List[int] = []
+        self.tasks: dict[int, ProjectTask] = {}
+        self.critical_path: list[int] = []
 
-    def parse_msproject_xml(self, xml_path: str) -> List[Dict]:
+    def parse_msproject_xml(self, xml_path: str) -> list[dict]:
         """Parseia um arquivo MSPDI (XML) do Microsoft Project."""
         tree = ET.parse(xml_path)
         root = tree.getroot()
@@ -61,7 +61,7 @@ class ProjectOrchestrationAdapter:
 
         return [self._task_to_arkhe(t) for t in tasks]
 
-    def _task_to_arkhe(self, task: ProjectTask) -> Dict:
+    def _task_to_arkhe(self, task: ProjectTask) -> dict:
         """Converte uma tarefa em um substrato ARKHE."""
         # Mapear percentual de conclusão para Φ_C
         phi_c = task.percent_complete / 100.0
@@ -101,13 +101,13 @@ Status: {status.value}
             "seal": seal,
         }
 
-    def compute_critical_path(self) -> List[int]:
+    def compute_critical_path(self) -> list[int]:
         """Calcula o caminho crítico (simplificado: maior duração)."""
         # Implementação simplificada: usar algoritmo de caminho mais longo
         # Em produção, integrar com a engine de scheduling do MS Project
         return self.critical_path
 
-    def generate_portfolio_decree(self, task_results: List[Dict]) -> str:
+    def generate_portfolio_decree(self, task_results: list[dict]) -> str:
         """Gera um decreto consolidado do portfólio."""
         phi_values = [t["phi_c"] for t in task_results]
         avg_phi = sum(phi_values) / len(phi_values) if phi_values else 0.0

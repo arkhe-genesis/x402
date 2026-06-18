@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 # "network_anomaly_detector.py" — Substrato 863.4
 # Monitora conexões de saída e bloqueia IPs suspeitos
-import subprocess
 import re
+import subprocess
+
 
 class NetworkAnomalyDetector:
     def __init__(self):
