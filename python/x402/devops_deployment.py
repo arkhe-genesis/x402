@@ -18,6 +18,7 @@ class DeploymentStrategy(Enum):
     CANARY = "canary"
     RECREATE = "recreate"
 
+
 @dataclass
 class Container:
     """Container Docker simulado."""
@@ -41,6 +42,7 @@ class Container:
         self.stop()
         time.sleep(0.1)
         self.start()
+
 
 class K8sPod:
     """Pod Kubernetes simulado."""
@@ -69,6 +71,7 @@ class K8sPod:
         for c in self.containers:
             c.stop()
         self.status = "Terminated"
+
 
 class CICDPipeline:
     """Pipeline CI/CD com stages."""
@@ -105,6 +108,7 @@ class CICDPipeline:
         print(f"[CI/CD] Pipeline {self.name} completed successfully")
         return True
 
+
 class InfrastructureAsCode:
     """Infraestrutura como Código (IaC)."""
 
@@ -113,11 +117,7 @@ class InfrastructureAsCode:
         self.state: dict[str, str] = {}
 
     def define_resource(self, name: str, resource_type: str, config: dict):
-        self.resources[name] = {
-            "type": resource_type,
-            "config": config,
-            "status": "defined"
-        }
+        self.resources[name] = {"type": resource_type, "config": config, "status": "defined"}
 
     def plan(self) -> list[str]:
         changes = []
@@ -133,6 +133,7 @@ class InfrastructureAsCode:
             self.state[name] = str(resource["config"])
             resource["status"] = "created"
             print(f"[IaC] Applied: {name} ({resource['type']})")
+
 
 class BlueGreenDeployer:
     """Deployer Blue-Green."""
@@ -170,6 +171,7 @@ class BlueGreenDeployer:
             print("[Blue-Green] Health check failed, rollback")
             new_pod.delete()
 
+
 class CanaryDeployer:
     """Deployer Canary."""
 
@@ -206,6 +208,7 @@ class CanaryDeployer:
         self.canary_percentage = 0
         print("[Canary] Rolled back")
 
+
 class ARKHEDeployer:
     """Deployer ARKHE: arkhe deploy --substrate 873 --target k8s"""
 
@@ -213,8 +216,12 @@ class ARKHEDeployer:
         self.pods: dict[str, K8sPod] = {}
         self.pipelines: dict[str, CICDPipeline] = {}
 
-    def deploy_substrate(self, substrate_id: str, image: str,
-                        strategy: DeploymentStrategy = DeploymentStrategy.ROLLING):
+    def deploy_substrate(
+        self,
+        substrate_id: str,
+        image: str,
+        strategy: DeploymentStrategy = DeploymentStrategy.ROLLING,
+    ):
         print(f"\n[ARKHE Deploy] Deploying substrate {substrate_id}")
         print(f"  Image: {image}")
         print(f"  Strategy: {strategy.value}")
@@ -238,8 +245,9 @@ class ARKHEDeployer:
     def status(self) -> dict:
         return {
             "pods": {k: v.status for k, v in self.pods.items()},
-            "pipelines": {k: v.status for k, v in self.pipelines.items()}
+            "pipelines": {k: v.status for k, v in self.pipelines.items()},
         }
+
 
 if __name__ == "__main__":
     # Test CI/CD

@@ -7,8 +7,6 @@ import numpy as np
 
 # Mock Qiskit if not available
 try:
-
-
     from qiskit.circuit.library import EfficientSU2
 
     QISKIT_AVAILABLE = True
@@ -23,12 +21,13 @@ class QuantumNeuromorphicOptimizer:
 
         if QISKIT_AVAILABLE:
             # Circuito variacional
-            EfficientSU2(num_neurons, entanglement='circular')
+            EfficientSU2(num_neurons, entanglement="circular")
+
             # Hamiltoniano: penaliza desvio das taxas alvo
             def hamiltonian(params):
                 # Executa circuito e mede
                 # ... (implementação simplificada)
-                return np.sum((np.random.rand(num_neurons) - target_rates)**2)
+                return np.sum((np.random.rand(num_neurons) - target_rates) ** 2)
 
             # Otimizador clássico
             # result = VQE(Estimator(), circuit, optimizer).compute_minimum_eigenvalue()
@@ -37,6 +36,7 @@ class QuantumNeuromorphicOptimizer:
         seal = hashlib.sha3_256(str(target_rates).encode()).hexdigest()[:16]
         decree = f"<|ARKHE_START|>\n<|SUBSTRATE|> 856-857-QNO\n<|PHI_C|> 0.850\n<|SEAL|> {seal}\n<|ARKHE_END|>"
         return {"decree": decree, "seal": seal}
+
 
 if __name__ == "__main__":
     opt = QuantumNeuromorphicOptimizer()

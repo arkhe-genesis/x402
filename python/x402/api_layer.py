@@ -23,11 +23,13 @@ class APIRequest:
     body: Any = None
     api_key: str | None = None
 
+
 @dataclass
 class APIResponse:
     status: int
     body: Any = None
     headers: dict[str, str] = field(default_factory=dict)
+
 
 class RESTEndpoint:
     """Endpoint REST com métodos HTTP padrão."""
@@ -50,6 +52,7 @@ class RESTEndpoint:
             return handler(request)
         return APIResponse(405, body="Method Not Allowed")
 
+
 class GraphQLEngine:
     """Motor GraphQL simplificado."""
 
@@ -65,6 +68,7 @@ class GraphQLEngine:
             key = f"{type_name}.{field}"
             self.resolvers[key] = func
             return func
+
         return decorator
 
     def execute(self, query: str) -> dict:
@@ -74,6 +78,7 @@ class GraphQLEngine:
             if key.split(".")[0] in query:
                 results[key] = resolver()
         return {"data": results}
+
 
 class RateLimiter:
     """Rate limiter com janela deslizante e bucket token."""
@@ -86,10 +91,7 @@ class RateLimiter:
     def is_allowed(self, client_id: str) -> bool:
         now = time.time()
         # Remove requests outside window
-        self.requests[client_id] = [
-            t for t in self.requests[client_id]
-            if now - t < self.window
-        ]
+        self.requests[client_id] = [t for t in self.requests[client_id] if now - t < self.window]
 
         if len(self.requests[client_id]) >= self.max_requests:
             return False
@@ -101,6 +103,7 @@ class RateLimiter:
         now = time.time()
         valid = [t for t in self.requests[client_id] if now - t < self.window]
         return max(0, self.max_requests - len(valid))
+
 
 class JWTAuth:
     """Autenticação JWT simplificada."""
@@ -126,6 +129,7 @@ class JWTAuth:
 
     def verify_token(self, token: str) -> dict | None:
         return self.tokens.get(token)
+
 
 class APIGateway:
     """API Gateway unificando REST, GraphQL e gRPC."""
@@ -160,6 +164,7 @@ class APIGateway:
 
         return APIResponse(404, body="Endpoint not found")
 
+
 if __name__ == "__main__":
     gateway = APIGateway()
 
@@ -179,5 +184,5 @@ if __name__ == "__main__":
     for i in range(105):
         allowed = gateway.rate_limiter.is_allowed("test-client")
         if not allowed:
-            print(f"[Rate Limiter] Blocked at request {i+1}")
+            print(f"[Rate Limiter] Blocked at request {i + 1}")
             break

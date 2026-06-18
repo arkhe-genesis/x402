@@ -1,9 +1,10 @@
-
 import aiohttp
 
 
 class ZeroExTradingModule:
-    def __init__(self, api_key: str, chain_id: int, wallet_address: str, zvec_memory, world_model=None):
+    def __init__(
+        self, api_key: str, chain_id: int, wallet_address: str, zvec_memory, world_model=None
+    ):
         self.api_key = api_key
         self.chain_id = chain_id
         self.wallet = wallet_address
@@ -12,7 +13,9 @@ class ZeroExTradingModule:
         self.base_url = "https://api.0x.org/swap/allowance-holder"
         self.session = None
 
-    async def execute_swap(self, sell_token: str, buy_token: str, sell_amount: int, slippage_bps: int = 100) -> dict | None:
+    async def execute_swap(
+        self, sell_token: str, buy_token: str, sell_amount: int, slippage_bps: int = 100
+    ) -> dict | None:
         """
         Executa um swap via 0x Swap API v2.
         Inclui validação de segurança e persistência de memória.
@@ -29,7 +32,9 @@ class ZeroExTradingModule:
 
         if self.session is None:
             self.session = aiohttp.ClientSession()
-        async with self.session.get(f"{self.base_url}/quote", params=params, headers=headers) as resp:
+        async with self.session.get(
+            f"{self.base_url}/quote", params=params, headers=headers
+        ) as resp:
             if resp.status != 200:
                 return None
             quote = await resp.json()
@@ -45,7 +50,9 @@ class ZeroExTradingModule:
             "taker": self.wallet,
             "sellAmount": sell_amount,
         }
-        async with self.session.get(f"{self.base_url}/approval", params=allowance_params, headers=headers) as resp:
+        async with self.session.get(
+            f"{self.base_url}/approval", params=allowance_params, headers=headers
+        ) as resp:
             await resp.json()
 
         # 3. Submissão da Transação (simplificado)
@@ -61,7 +68,7 @@ class ZeroExTradingModule:
             "type": "trade_execution",
             "content": f"Swapped {sell_amount} of {sell_token} for {buy_token}",
             "embedding": embedding,
-            "result": result
+            "result": result,
         }
         if hasattr(self.zvec, "store_transaction_embedding"):
             self.zvec.store_transaction_embedding(embedding, result)
@@ -78,7 +85,9 @@ class ZeroExTradingModule:
         # Simplificado
         return "0x_mock_tx_hash"
 
-    async def _get_market_embedding(self, sell_token: str, buy_token: str, sell_amount: int, quote: dict) -> list:
+    async def _get_market_embedding(
+        self, sell_token: str, buy_token: str, sell_amount: int, quote: dict
+    ) -> list:
         # Simplificado
         return [0.0] * 256
 

@@ -19,6 +19,7 @@ class DNSRecord:
     ttl: int = 300
     record_type: str = "A"
 
+
 class DNSResolver:
     """Simulação de resolver DNS com cache."""
 
@@ -42,6 +43,7 @@ class DNSResolver:
     def invalidate_cache(self, domain: str):
         self.cache.pop(domain, None)
 
+
 @dataclass
 class HTTPRequest:
     method: str
@@ -49,11 +51,13 @@ class HTTPRequest:
     headers: dict[str, str] = field(default_factory=dict)
     body: str = ""
 
+
 @dataclass
 class HTTPResponse:
     status: int
     headers: dict[str, str] = field(default_factory=dict)
     body: str = ""
+
 
 class HTTPServer:
     """Servidor HTTP/HTTPS simulado."""
@@ -68,6 +72,7 @@ class HTTPServer:
         def decorator(func):
             self.routes[path] = func
             return func
+
         return decorator
 
     def handle(self, request: HTTPRequest) -> HTTPResponse:
@@ -75,6 +80,7 @@ class HTTPServer:
         if handler:
             return handler(request)
         return HTTPResponse(404, body="Not Found")
+
 
 class LoadBalancer:
     """Load Balancer com múltiplos algoritmos."""
@@ -114,6 +120,7 @@ class LoadBalancer:
         for backend in self.backends:
             self.health_status[backend] = random.random() > 0.1
 
+
 class ReverseProxy:
     """Reverse Proxy com rate limiting e SSL termination."""
 
@@ -135,8 +142,8 @@ class ReverseProxy:
         if not backend:
             return HTTPResponse(503, body="No healthy backends")
 
-        return HTTPResponse(200, headers={"X-Backend": backend},
-                          body=f"Proxied to {backend}")
+        return HTTPResponse(200, headers={"X-Backend": backend}, body=f"Proxied to {backend}")
+
 
 class WebSocketManager:
     """Gerenciador de conexões WebSocket."""
@@ -157,13 +164,14 @@ class WebSocketManager:
         for client_id in self.subscriptions.get(channel, []):
             await self.connections[client_id].put(message)
 
+
 if __name__ == "__main__":
     dns = DNSResolver()
     print(f"[DNS] arkhe.io -> {dns.resolve('arkhe.io')}")
 
     lb = LoadBalancer(["backend-1:8080", "backend-2:8080", "backend-3:8080"], "round_robin")
     for i in range(6):
-        print(f"[LB] Request {i+1} -> {lb.get_backend()}")
+        print(f"[LB] Request {i + 1} -> {lb.get_backend()}")
 
     proxy = ReverseProxy(lb)
     req = HTTPRequest("GET", "/api/data")

@@ -23,9 +23,11 @@ class OrchestrationMode(Enum):
     SUPERVISED = "supervised"
     MANUAL = "manual"
 
+
 @dataclass
 class SystemHealth:
     """Estado de saúde do sistema orquestrado."""
+
     substrate_id: str
     phi_c: float
     status: str
@@ -36,9 +38,8 @@ class SystemHealth:
 
     @property
     def is_healthy(self) -> bool:
-        return (self.phi_c >= 0.577 and
-                self.error_rate < 0.01 and
-                self.latency_p95 < 1.0)
+        return self.phi_c >= 0.577 and self.error_rate < 0.01 and self.latency_p95 < 1.0
+
 
 class BioDigitalHealing:
     """
@@ -83,6 +84,7 @@ class BioDigitalHealing:
         """Adapta taxa metabólica baseada na carga do sistema."""
         self.metabolic_rate = 1.0 + system_load * 0.5
         print(f"[Bio-Digital] Metabolic rate adapted: {self.metabolic_rate:.2f}x")
+
 
 class ConsciousnessAwareScheduler:
     """
@@ -139,6 +141,7 @@ class ConsciousnessAwareScheduler:
 
         return {"predicted_load": prediction, "allocation": allocation}
 
+
 class PolaritonicEdge:
     """
     Integração Edge Computing (873) + Polaritonic Computing (862).
@@ -157,8 +160,7 @@ class PolaritonicEdge:
     def process_at_edge(self, task: dict, latency_requirement: float) -> tuple[str, float]:
         """Processa tarefa no edge com latência mínima."""
         # Seleciona nó mais próximo (menor latência)
-        best_node = min(self.edge_nodes,
-                       key=lambda n: random.uniform(0.001, latency_requirement))
+        best_node = min(self.edge_nodes, key=lambda n: random.uniform(0.001, latency_requirement))
 
         # Simula processamento polaritônico (ultra-rápido)
         processing_time = random.uniform(0.001, 0.01) * (1 - self.strong_coupling_factor)
@@ -179,6 +181,7 @@ class PolaritonicEdge:
             grouped[task_type].append(task)
 
         return {"mode": "condensate", "groups": grouped}
+
 
 class RegistryObservability:
     """
@@ -201,14 +204,13 @@ class RegistryObservability:
             self.registry_metrics[key] = []
         self.registry_metrics[key].append(time.time())
 
-    def record_invocation(self, tool_id: int, substrate_id: str,
-                         latency: float, success: bool):
+    def record_invocation(self, tool_id: int, substrate_id: str, latency: float, success: bool):
         trace = {
             "tool_id": tool_id,
             "substrate_id": substrate_id,
             "latency": latency,
             "success": success,
-            "timestamp": time.time()
+            "timestamp": time.time(),
         }
         self.invocation_traces.append(trace)
 
@@ -217,16 +219,13 @@ class RegistryObservability:
         anomalies = []
 
         # Taxa de erro anormal
-        recent = [t for t in self.invocation_traces
-                 if time.time() - t["timestamp"] < 300]
+        recent = [t for t in self.invocation_traces if time.time() - t["timestamp"] < 300]
         if recent:
             error_rate = sum(1 for t in recent if not t["success"]) / len(recent)
             if error_rate > 0.1:
-                anomalies.append({
-                    "type": "high_error_rate",
-                    "value": error_rate,
-                    "severity": "critical"
-                })
+                anomalies.append(
+                    {"type": "high_error_rate", "value": error_rate, "severity": "critical"}
+                )
 
         # Latência anormal
         latencies = [t["latency"] for t in recent]
@@ -234,13 +233,10 @@ class RegistryObservability:
             sum(latencies) / len(latencies)
             p95 = sorted(latencies)[int(len(latencies) * 0.95)]
             if p95 > 2.0:
-                anomalies.append({
-                    "type": "high_latency",
-                    "value": p95,
-                    "severity": "warning"
-                })
+                anomalies.append({"type": "high_latency", "value": p95, "severity": "warning"})
 
         return anomalies
+
 
 class SystemDesignOrchestrator:
     """
@@ -288,7 +284,7 @@ class SystemDesignOrchestrator:
             symptoms = {
                 "error_rate": random.uniform(0, 0.02),
                 "latency_p95": random.uniform(0.05, 0.5),
-                "load": random.uniform(0.3, 0.8)
+                "load": random.uniform(0.3, 0.8),
             }
             response = self.bio_healing.detect_pathogen(pillar_id, symptoms)
             print(f"  {pillar['name']}: {response}")
@@ -304,10 +300,9 @@ class SystemDesignOrchestrator:
         print(f"  Allocation: {prediction['allocation']}")
 
         # Broadcast crítico se necessário
-        if prediction['predicted_load'] > 0.8:
+        if prediction["predicted_load"] > 0.8:
             self.conscious_scheduler.broadcast(
-                {"substrate_id": "882", "action": "scale_up", "reason": "high_load"},
-                priority=0.9
+                {"substrate_id": "882", "action": "scale_up", "reason": "high_load"}, priority=0.9
             )
 
         # 3. Polaritonic Edge Processing
@@ -319,17 +314,18 @@ class SystemDesignOrchestrator:
         ]
         condensate = self.polaritonic_edge.form_condensate(tasks)
         print(f"  Processing mode: {condensate['mode']}")
-        if condensate['mode'] == "condensate":
-            for task_type, group in condensate['groups'].items():
+        if condensate["mode"] == "condensate":
+            for task_type, group in condensate["groups"].items():
                 print(f"    {task_type}: {len(group)} tasks batched")
 
         # 4. Registry Observability
         print("\n[4/4] REGISTRY OBSERVABILITY")
         for tool_id in range(1, 4):
             self.registry_obs.record_invocation(
-                tool_id, f"substrate-{tool_id}",
+                tool_id,
+                f"substrate-{tool_id}",
                 latency=random.uniform(0.01, 0.5),
-                success=random.random() > 0.05
+                success=random.random() > 0.05,
             )
 
         anomalies = self.registry_obs.detect_anomalies()
@@ -349,7 +345,7 @@ class SystemDesignOrchestrator:
         return {
             "avg_phi": avg_phi,
             "metabolic_rate": self.bio_healing.metabolic_rate,
-            "anomalies": len(anomalies)
+            "anomalies": len(anomalies),
         }
 
     def deploy_full_stack(self):
@@ -378,6 +374,7 @@ class SystemDesignOrchestrator:
 
         print("\n  ✓ Full stack deployed successfully")
 
+
 if __name__ == "__main__":
     orchestrator = SystemDesignOrchestrator()
 
@@ -386,8 +383,8 @@ if __name__ == "__main__":
 
     # Run orchestration cycles
     for cycle in range(3):
-        print(f"\n{'='*70}")
+        print(f"\n{'=' * 70}")
         print(f"  ORCHESTRATION CYCLE {cycle + 1}/3")
-        print(f"{'='*70}")
+        print(f"{'=' * 70}")
         metrics = orchestrator.orchestrate_cycle()
         print(f"\n  Cycle {cycle + 1} complete: {metrics}")

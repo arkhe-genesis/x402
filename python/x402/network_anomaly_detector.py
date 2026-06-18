@@ -20,13 +20,14 @@ class NetworkAnomalyDetector:
         for line in output.splitlines():
             if "ESTABLISHED" in line:
                 # extrai IP de destino
-                match = re.search(r'(\d+\.\d+\.\d+\.\d+):\d+\s+ESTABLISHED', line)
+                match = re.search(r"(\d+\.\d+\.\d+\.\d+):\d+\s+ESTABLISHED", line)
                 if match:
                     ip = match.group(1)
                     if ip in self.known_malicious_ips:
                         print(f"[ALERTA] Conexão com IP malicioso: {ip}")
                         # Bloqueia via iptables (exemplo)
                         # subprocess.run(["sudo", "iptables", "-A", "OUTPUT", "-d", ip, "-j", "DROP"])
+
 
 if __name__ == "__main__":
     detector = NetworkAnomalyDetector()

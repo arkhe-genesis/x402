@@ -12,6 +12,7 @@ class ProjectStatus(Enum):
     AT_RISK = "CANONIZED_PROVISIONAL"
     OFF_TRACK = "PROPOSED"
 
+
 @dataclass
 class ProjectTask:
     uid: int
@@ -22,11 +23,13 @@ class ProjectTask:
     predecessors: list[int]
     successors: list[int]
 
+
 class ProjectOrchestrationAdapter:
     """
     Ponte entre MS Project/Primavera e ARKHE OS.
     Converte cronogramas em Substratos e aplica o Ghost Threshold ao progresso.
     """
+
     def __init__(self):
         self.tasks: dict[int, ProjectTask] = {}
         self.critical_path: list[int] = []
@@ -35,18 +38,18 @@ class ProjectOrchestrationAdapter:
         """Parseia um arquivo MSPDI (XML) do Microsoft Project."""
         tree = ET.parse(xml_path)
         root = tree.getroot()
-        ns = {'p': 'http://schemas.microsoft.com/project'}
+        ns = {"p": "http://schemas.microsoft.com/project"}
 
         tasks = []
-        for task_elem in root.findall('.//p:Task', ns):
-            uid = int(task_elem.find('p:UID', ns).text)
-            name = task_elem.find('p:Name', ns).text or ""
-            start = task_elem.find('p:Start', ns).text or ""
-            finish = task_elem.find('p:Finish', ns).text or ""
-            pct = int(task_elem.find('p:PercentComplete', ns).text or "0")
+        for task_elem in root.findall(".//p:Task", ns):
+            uid = int(task_elem.find("p:UID", ns).text)
+            name = task_elem.find("p:Name", ns).text or ""
+            start = task_elem.find("p:Start", ns).text or ""
+            finish = task_elem.find("p:Finish", ns).text or ""
+            pct = int(task_elem.find("p:PercentComplete", ns).text or "0")
 
             predecessors = []
-            for pred in task_elem.findall('.//p:PredecessorLink/p:PredecessorUID', ns):
+            for pred in task_elem.findall(".//p:PredecessorLink/p:PredecessorUID", ns):
                 predecessors.append(int(pred.text))
 
             task = ProjectTask(uid, name, start, finish, pct, predecessors, [])
@@ -132,6 +135,7 @@ Tarefas Fora do Rumo (abaixo do Ghost Threshold γ=0.577):
 <|SEAL|> {hashlib.sha3_256(str(task_results).encode()).hexdigest()[:16]}
 <|ARKHE_END|>"""
         return decree
+
 
 # Exemplo de uso
 if __name__ == "__main__":

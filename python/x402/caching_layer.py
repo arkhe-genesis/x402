@@ -28,6 +28,7 @@ class CacheEntry:
     def size(self) -> int:
         return len(str(self.value).encode())
 
+
 class LRUCache:
     """Cache LRU (Least Recently Used) com TTL."""
 
@@ -83,6 +84,7 @@ class LRUCache:
             self.cache.clear()
             self.current_size = 0
 
+
 class WriteThroughCache:
     """Cache com estratégia write-through."""
 
@@ -106,6 +108,7 @@ class WriteThroughCache:
             self.cache.set(key, value)
         return value
 
+
 class CDNNode:
     """Nó de CDN para distribuição de conteúdo."""
 
@@ -128,11 +131,12 @@ class CDNNode:
         total = self.hit_count + self.miss_count
         return self.hit_count / total if total > 0 else 0.0
 
+
 class CacheOrchestrator:
     """Orquestrador de múltiplas camadas de cache."""
 
     def __init__(self):
-        self.l1_cache = LRUCache(max_size=100, default_ttl=60)   # In-memory
+        self.l1_cache = LRUCache(max_size=100, default_ttl=60)  # In-memory
         self.l2_cache = LRUCache(max_size=1000, default_ttl=300)  # Redis-like
         self.cdn_nodes: list[CDNNode] = []
 
@@ -156,6 +160,7 @@ class CacheOrchestrator:
     def set(self, key: str, value: Any):
         self.l1_cache.set(key, value)
         self.l2_cache.set(key, value)
+
 
 if __name__ == "__main__":
     cache = LRUCache(max_size=5)

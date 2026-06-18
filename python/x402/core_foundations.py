@@ -17,11 +17,13 @@ class ScalingMode(Enum):
     HORIZONTAL = "horizontal"
     VERTICAL = "vertical"
 
+
 class ArchitecturePattern(Enum):
     MONOLITH = "monolith"
     MICROSERVICES = "microservices"
     SERVERLESS = "serverless"
     EDGE = "edge"
+
 
 @dataclass
 class SystemNode:
@@ -33,6 +35,7 @@ class SystemNode:
     @property
     def utilization(self) -> float:
         return self.load / self.capacity if self.capacity > 0 else 1.0
+
 
 class CAPTheorem:
     """Simulação do Teorema CAP: Consistency, Availability, Partition Tolerance."""
@@ -56,6 +59,7 @@ class CAPTheorem:
             return {"consistency": False, "availability": True, "partition_tolerance": True}
         else:
             return {"error": "CA impossible in distributed systems"}
+
 
 class SelfHealingSystem:
     """Sistema auto-curativo com detecção de falhas e recuperação."""
@@ -86,14 +90,17 @@ class SelfHealingSystem:
                 self.nodes.remove(node)
                 healed_count += 1
 
-        self.failure_history.append({
-            "timestamp": str(datetime.now()),
-            "failed": len(failed),
-            "healed": healed_count,
-            "strategy": strategy
-        })
+        self.failure_history.append(
+            {
+                "timestamp": str(datetime.now()),
+                "failed": len(failed),
+                "healed": healed_count,
+                "strategy": strategy,
+            }
+        )
 
         return {"healed": healed_count, "total_nodes": len(self.nodes), "strategy": strategy}
+
 
 class AINativeScheduler:
     """Scheduler AI-native para alocação de recursos."""
@@ -118,6 +125,7 @@ class AINativeScheduler:
         best_node.load += task_load
         return best_node
 
+
 if __name__ == "__main__":
     nodes = [SystemNode(f"node-{i}", capacity=100.0) for i in range(5)]
 
@@ -137,4 +145,4 @@ if __name__ == "__main__":
     scheduler = AINativeScheduler(nodes)
     for i in range(10):
         node = scheduler.schedule(task_load=random.uniform(5, 20))
-        print(f"[Scheduler] Task {i+1} -> {node.id} (util: {node.utilization:.2%})")
+        print(f"[Scheduler] Task {i + 1} -> {node.id} (util: {node.utilization:.2%})")

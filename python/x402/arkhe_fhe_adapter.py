@@ -12,6 +12,7 @@ import pvac_hfhe  # Bindings PyBind11
 
 logger = logging.getLogger("arkhe.fhe")
 
+
 class ArkheFHEAdapter:
     """Ponte entre o Parametric Memory Engine e a criptografia homomórfica."""
 

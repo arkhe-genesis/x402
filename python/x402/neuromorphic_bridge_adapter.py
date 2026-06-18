@@ -8,12 +8,13 @@ import numpy as np
 
 class IzhikevichNeuron:
     """Modelo de neurônio Izhikevich para simulação neuromórfica."""
+
     def __init__(self, a=0.02, b=0.2, c=-65.0, d=8.0):
-        self.a = a      # taxa de recuperação
-        self.b = b      # sensibilidade ao ruído
-        self.c = c      # reset do potencial de membrana
-        self.d = d      # after-spike reset da recuperação
-        self.v = c      # potencial de membrana inicial
+        self.a = a  # taxa de recuperação
+        self.b = b  # sensibilidade ao ruído
+        self.c = c  # reset do potencial de membrana
+        self.d = d  # after-spike reset da recuperação
+        self.v = c  # potencial de membrana inicial
         self.u = b * c  # variável de recuperação inicial
 
     def step(self, I_ext: float, dt: float = 0.5) -> int:
@@ -28,11 +29,13 @@ class IzhikevichNeuron:
             return 1
         return 0
 
+
 class NeuromorphicArkheBridge:
     """
     Ponte entre hardware neuromórfico e ARKHE OS.
     Simula uma rede de spiking neurons cuja sincronia mede a coerência.
     """
+
     def __init__(self, num_neurons: int = 256):
         self.num_neurons = num_neurons
         self.neurons = [IzhikevichNeuron() for _ in range(num_neurons)]
@@ -55,8 +58,10 @@ class NeuromorphicArkheBridge:
                 # Simples: corrente constante com ruído + acoplamento global
                 noise = np.random.normal(0, 0.5)
                 # Acoplamento médio dos spikes anteriores (simplificação)
-                if t > 0 and t % 10 == 0: # atualiza acoplamento a cada 10 passos
-                    np.array([1 if (t-10 < st < t) else 0 for st in spike_times[i]]) # não implementado perfeitamente
+                if t > 0 and t % 10 == 0:  # atualiza acoplamento a cada 10 passos
+                    np.array(
+                        [1 if (t - 10 < st < t) else 0 for st in spike_times[i]]
+                    )  # não implementado perfeitamente
                 i_input = external_input + noise
                 spike = neuron.step(i_input)
                 if spike:
@@ -96,6 +101,7 @@ Ghost Threshold (γ): 0.577 | Status: {status}
         """
         seal = hashlib.sha3_256("|".join(substrate_ids).encode()).hexdigest()[:16]
         return f"<|ARKHE_START|>\n<|SUBSTRATE|> 857-LOIHI-DEPLOY\n<|SEAL|> {seal}\n<|ARKHE_END|>"
+
 
 # Exemplo de uso
 if __name__ == "__main__":

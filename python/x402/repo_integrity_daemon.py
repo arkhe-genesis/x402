@@ -6,9 +6,19 @@ import hashlib
 import requests
 
 SUSPICIOUS_PATTERNS = [
-    "security", "wallet", "auditor", "defi", "risk", "scanner",
-    "checker", "validator", "protector", "guard", "shield"
+    "security",
+    "wallet",
+    "auditor",
+    "defi",
+    "risk",
+    "scanner",
+    "checker",
+    "validator",
+    "protector",
+    "guard",
+    "shield",
 ]
+
 
 class RepoIntegrityDaemon:
     def __init__(self, webhook_url=None):
@@ -32,6 +42,7 @@ class RepoIntegrityDaemon:
         # Enviar para Telegraph
         if self.webhook_url:
             requests.post(self.webhook_url, json={"alert": alert, "seal": seal})
+
 
 # Execução
 if __name__ == "__main__":

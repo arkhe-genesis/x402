@@ -41,6 +41,7 @@ class ACIDTransaction:
             pass
         self.committed = False
 
+
 class ShardManager:
     """Gerenciador de sharding consistente."""
 
@@ -70,6 +71,7 @@ class ShardManager:
         for key, value in all_data.items():
             self.put(key, value)
 
+
 class ReplicationManager:
     """Gerenciador de replicação master-slave."""
 
@@ -95,6 +97,7 @@ class ReplicationManager:
             nearest = min(self.slaves, key=lambda s: self.replication_lag[s])
             return f"value_from_{nearest}"
 
+
 class IndexManager:
     """Gerenciador de índices B-Tree simplificado."""
 
@@ -112,6 +115,7 @@ class IndexManager:
 
     def query_index(self, table: str, column: str, value: Any) -> list[int]:
         return self.indexes.get(f"{table}.{column}", {}).get(value, [])
+
 
 if __name__ == "__main__":
     # Test ACID

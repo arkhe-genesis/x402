@@ -10,6 +10,7 @@ class HPCArkheBridge:
     Ponte entre clusters HPC gerenciados por Slurm e ARKHE OS.
     Permite que Substratos sejam executados como jobs paralelos.
     """
+
     def __init__(self, partition: str = "defq", nodes: int = 1, gpus_per_node: int = 0):
         self.partition = partition
         self.nodes = nodes
@@ -39,11 +40,11 @@ export ARKHE_PHI_C=0.998
 {payload_script}
 """
         script_path = f"/tmp/arkhe_job_{substrate_id}.sh"
-        with open(script_path, 'w') as f:
+        with open(script_path, "w") as f:
             f.write(sbatch_script)
 
         # Submeter ao Slurm
-        result = subprocess.run(['sbatch', script_path], capture_output=True, text=True)
+        result = subprocess.run(["sbatch", script_path], capture_output=True, text=True)
         job_id = result.stdout.strip().split()[-1] if result.returncode == 0 else None
 
         return {
@@ -51,14 +52,15 @@ export ARKHE_PHI_C=0.998
             "substrate_id": substrate_id,
             "seal": seal,
             "status": "SUBMITTED" if job_id else "FAILED",
-            "decree": f"<|ARKHE_START|>\n<|SUBSTRATE|> {substrate_id}\n<|JOB_ID|> {job_id}\n<|SEAL|> {seal}\n<|ARKHE_END|>"
+            "decree": f"<|ARKHE_START|>\n<|SUBSTRATE|> {substrate_id}\n<|JOB_ID|> {job_id}\n<|SEAL|> {seal}\n<|ARKHE_END|>",
         }
 
     def check_job_status(self, job_id: str) -> str:
         """Verifica o status de um job via sacct."""
-        result = subprocess.run(['sacct', '-j', job_id, '--format=State', '--noheader'],
-                                capture_output=True, text=True)
-        return result.stdout.strip().split('\n')[0] if result.stdout else "UNKNOWN"
+        result = subprocess.run(
+            ["sacct", "-j", job_id, "--format=State", "--noheader"], capture_output=True, text=True
+        )
+        return result.stdout.strip().split("\n")[0] if result.stdout else "UNKNOWN"
 
     def run_mpi_kuramoto(self, N: int, K: float, steps: int) -> dict:
         """
@@ -87,6 +89,7 @@ if rank == 0:
 "
 """
         return self.submit_arkhe_job("830-TCCE-MPI", script)
+
 
 # Exemplo de uso
 if __name__ == "__main__":

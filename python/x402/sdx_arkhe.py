@@ -41,59 +41,74 @@ class SDXArkhe:
     ARKHE_NAMESPACE = "https://arkhe.org/ontology/841#"
 
     CLASSES = [
-        "Artifact", "Package", "Version", "Dependency", "Repository",
-        "License", "Checksum", "Signature", "BuildRecipe", "Provenance"
+        "Artifact",
+        "Package",
+        "Version",
+        "Dependency",
+        "Repository",
+        "License",
+        "Checksum",
+        "Signature",
+        "BuildRecipe",
+        "Provenance",
     ]
 
     OBJECT_PROPERTIES = [
-        "hasVersion", "dependsOn", "publishedAt", "licensedUnder",
-        "hasChecksum", "hasSignature", "buildFrom", "hasProvenance"
+        "hasVersion",
+        "dependsOn",
+        "publishedAt",
+        "licensedUnder",
+        "hasChecksum",
+        "hasSignature",
+        "buildFrom",
+        "hasProvenance",
     ]
 
     DATA_PROPERTIES = [
-        "versionString", "artifactName", "checksumValue",
-        "licenseSPDX", "repositoryURL", "buildDate", "buildEnvironment"
+        "versionString",
+        "artifactName",
+        "checksumValue",
+        "licenseSPDX",
+        "repositoryURL",
+        "buildDate",
+        "buildEnvironment",
     ]
 
     def __init__(self):
         self.artifacts = []
 
-    def create_artifact(self, name: str, version: str, license_spdx: str,
-                        checksum: str, repo_url: str, dependencies: list = None,
-                        signature: str = None, build_recipe: str = None,
-                        seal_hash: str = None) -> dict:
+    def create_artifact(
+        self,
+        name: str,
+        version: str,
+        license_spdx: str,
+        checksum: str,
+        repo_url: str,
+        dependencies: list = None,
+        signature: str = None,
+        build_recipe: str = None,
+        seal_hash: str = None,
+    ) -> dict:
         """Cria um artefato SDX completo com JSON-LD."""
         artifact = {
             "@context": {
                 "sdx": self.SDX_NAMESPACE,
                 "spdx": self.SPDX_NAMESPACE,
-                "arkhe": self.ARKHE_NAMESPACE
+                "arkhe": self.ARKHE_NAMESPACE,
             },
             "@type": "sdx:Package",
             "@id": f"arkhe:package/{name}/{version}",
             "sdx:artifactName": name,
-            "sdx:hasVersion": {
-                "@type": "sdx:Version",
-                "sdx:versionString": version
-            },
-            "sdx:licensedUnder": {
-                "@type": "sdx:License",
-                "sdx:licenseSPDX": license_spdx
-            },
-            "sdx:hasChecksum": {
-                "@type": "sdx:Checksum",
-                "sdx:checksumValue": checksum
-            },
-            "sdx:publishedAt": {
-                "@type": "sdx:Repository",
-                "sdx:repositoryURL": repo_url
-            },
+            "sdx:hasVersion": {"@type": "sdx:Version", "sdx:versionString": version},
+            "sdx:licensedUnder": {"@type": "sdx:License", "sdx:licenseSPDX": license_spdx},
+            "sdx:hasChecksum": {"@type": "sdx:Checksum", "sdx:checksumValue": checksum},
+            "sdx:publishedAt": {"@type": "sdx:Repository", "sdx:repositoryURL": repo_url},
             "sdx:dependsOn": dependencies or [],
             "arkhe:hasSeal": {
                 "@type": "arkhe:Seal",
                 "arkhe:hashAlgorithm": "SHA3-256",
-                "arkhe:sealHash": seal_hash or "PENDING"
-            }
+                "arkhe:sealHash": seal_hash or "PENDING",
+            },
         }
         if signature:
             artifact["sdx:hasSignature"] = {"@type": "sdx:Signature", "value": signature}
@@ -127,11 +142,7 @@ class SDXArkhe:
             if lic not in valid_spdx:
                 errors.append(f"License '{lic}' not in canonical SPDX list")
 
-        return {
-            "valid": len(errors) == 0,
-            "errors": errors,
-            "checks_passed": 4 - len(errors)
-        }
+        return {"valid": len(errors) == 0, "errors": errors, "checks_passed": 4 - len(errors)}
 
 
 if __name__ == "__main__":
@@ -143,7 +154,7 @@ if __name__ == "__main__":
         checksum="7c1e8d3f9a2b5c6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e",
         repo_url="https://apt.arkhe.org",
         dependencies=[{"name": "glibc", "constraint": ">=2.31"}],
-        seal_hash="a1b2c3d4e5f6a7b8"
+        seal_hash="a1b2c3d4e5f6a7b8",
     )
     print(sdx.to_jsonld(pkg))
     print("\nValidation:", sdx.validate(pkg))

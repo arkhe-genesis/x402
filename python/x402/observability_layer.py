@@ -22,6 +22,7 @@ class LogEntry:
     trace_id: str | None = None
     span_id: str | None = None
 
+
 class StructuredLogger:
     """Logger estruturado com níveis e contexto."""
 
@@ -38,15 +39,22 @@ class StructuredLogger:
                 timestamp=time.time(),
                 level=level,
                 message=message,
-                context={"service": self.service, **context}
+                context={"service": self.service, **context},
             )
             self.logs.append(entry)
             print(f"[{level}] {self.service}: {message}")
 
-    def debug(self, msg: str, **ctx): self.log("DEBUG", msg, **ctx)
-    def info(self, msg: str, **ctx): self.log("INFO", msg, **ctx)
-    def warn(self, msg: str, **ctx): self.log("WARN", msg, **ctx)
-    def error(self, msg: str, **ctx): self.log("ERROR", msg, **ctx)
+    def debug(self, msg: str, **ctx):
+        self.log("DEBUG", msg, **ctx)
+
+    def info(self, msg: str, **ctx):
+        self.log("INFO", msg, **ctx)
+
+    def warn(self, msg: str, **ctx):
+        self.log("WARN", msg, **ctx)
+
+    def error(self, msg: str, **ctx):
+        self.log("ERROR", msg, **ctx)
 
     def query(self, level: str = None, time_range: tuple = None) -> list[LogEntry]:
         results = list(self.logs)
@@ -56,12 +64,14 @@ class StructuredLogger:
             results = [e for e in results if time_range[0] <= e.timestamp <= time_range[1]]
         return results
 
+
 @dataclass
 class Metric:
     name: str
     value: float
     timestamp: float
     labels: dict[str, str] = field(default_factory=dict)
+
 
 class MetricsCollector:
     """Coletor de métricas com agregação."""
@@ -95,8 +105,9 @@ class MetricsCollector:
             "avg": sum(values) / len(values),
             "min": min(values),
             "max": max(values),
-            "p95": sorted(values)[int(len(values) * 0.95)] if len(values) > 20 else max(values)
+            "p95": sorted(values)[int(len(values) * 0.95)] if len(values) > 20 else max(values),
         }
+
 
 class DistributedTracer:
     """Tracer distribuído com spans e trace context."""
@@ -119,7 +130,7 @@ class DistributedTracer:
             "parent_id": parent_id,
             "start_time": time.time(),
             "end_time": None,
-            "tags": {}
+            "tags": {},
         }
         self.traces[self.current_trace].append(span)
         return span["id"]
@@ -143,6 +154,7 @@ class DistributedTracer:
             return max(ends) - min(starts)
         return 0.0
 
+
 class AlertManager:
     """Gerenciador de alertas com thresholds."""
 
@@ -151,16 +163,19 @@ class AlertManager:
         self.alerts: deque = deque(maxlen=1000)
         self.alert_count = defaultdict(int)
 
-    def add_rule(self, name: str, metric: str, threshold: float,
-                 operator: str = ">", duration: float = 60.0):
-        self.rules.append({
-            "name": name,
-            "metric": metric,
-            "threshold": threshold,
-            "operator": operator,
-            "duration": duration,
-            "triggered_at": None
-        })
+    def add_rule(
+        self, name: str, metric: str, threshold: float, operator: str = ">", duration: float = 60.0
+    ):
+        self.rules.append(
+            {
+                "name": name,
+                "metric": metric,
+                "threshold": threshold,
+                "operator": operator,
+                "duration": duration,
+                "triggered_at": None,
+            }
+        )
 
     def evaluate(self, metrics: dict[str, float]):
         for rule in self.rules:
@@ -188,11 +203,14 @@ class AlertManager:
             "metric": rule["metric"],
             "value": value,
             "threshold": rule["threshold"],
-            "timestamp": time.time()
+            "timestamp": time.time(),
         }
         self.alerts.append(alert)
         self.alert_count[rule["name"]] += 1
-        print(f"[ALERT] {rule['name']}: {rule['metric']}={value:.2f} (threshold: {rule['threshold']})")
+        print(
+            f"[ALERT] {rule['name']}: {rule['metric']}={value:.2f} (threshold: {rule['threshold']})"
+        )
+
 
 class SLAManager:
     """Gerenciador de SLA/SLO/SLI."""
@@ -206,10 +224,7 @@ class SLAManager:
         Define SLOs para um serviço.
         Ex: {"availability": 0.999, "latency_p95": 0.2, "error_rate": 0.001}
         """
-        self.slas[service] = {
-            "slo": slo,
-            "breaches": []
-        }
+        self.slas[service] = {"slo": slo, "breaches": []}
 
     def record_sli(self, service: str, metric: str, value: float):
         self.slis[f"{service}.{metric}"].append(value)
@@ -226,13 +241,10 @@ class SLAManager:
             if values:
                 actual = sum(values) / len(values)
                 compliant = actual >= target if metric != "error_rate" else actual <= target
-                results[metric] = {
-                    "target": target,
-                    "actual": actual,
-                    "compliant": compliant
-                }
+                results[metric] = {"target": target, "actual": actual, "compliant": compliant}
 
         return results
+
 
 class ObservabilityPlatform:
     """Plataforma unificada de observabilidade."""
@@ -246,6 +258,7 @@ class ObservabilityPlatform:
 
     def instrument(self, func):
         """Decorator para instrumentação automática."""
+
         def wrapper(*args, **kwargs):
             trace_id = self.tracer.start_trace(func.__name__)
             start = time.time()
@@ -262,7 +275,9 @@ class ObservabilityPlatform:
                 duration = time.time() - start
                 self.metrics.record("request.duration", duration)
                 self.tracer.end_span(self.tracer.traces[trace_id][0]["id"])
+
         return wrapper
+
 
 if __name__ == "__main__":
     obs = ObservabilityPlatform("arkhe-gateway")

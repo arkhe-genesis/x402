@@ -24,6 +24,7 @@ class Message:
     offset: int = 0
     key: str | None = None
 
+
 class Topic:
     """Tópico de mensagens com partições."""
 
@@ -57,6 +58,7 @@ class Topic:
         self.consumers[consumer_id] = last_offset + len(messages)
         return messages
 
+
 class EventBus:
     """Event Bus com pub/sub pattern."""
 
@@ -80,6 +82,7 @@ class EventBus:
         if event_type:
             return [e for e in self.event_history if e["type"] == event_type]
         return list(self.event_history)
+
 
 class AsyncProcessor:
     """Processador assíncrono de mensagens."""
@@ -114,6 +117,7 @@ class AsyncProcessor:
         workers = [asyncio.create_task(self.worker()) for _ in range(n_workers)]
         await asyncio.gather(*workers)
 
+
 class MessageOrchestrator:
     """Orquestrador de mensagens integrando Kafka + Pub/Sub + Async."""
 
@@ -138,6 +142,7 @@ class MessageOrchestrator:
     async def process_queue(self):
         await self.async_processor.start()
 
+
 if __name__ == "__main__":
     # Test Kafka-like topic
     topic = Topic("substrate-events", n_partitions=3)
@@ -149,8 +154,10 @@ if __name__ == "__main__":
 
     # Test Event Bus
     bus = EventBus()
+
     def handler(payload):
         print(f"[Pub/Sub] Received: {payload}")
+
     bus.subscribe("substrate.registered", handler)
     bus.publish("substrate.registered", {"id": "873", "name": "CORE-FOUNDATIONS"})
 

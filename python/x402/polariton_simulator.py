@@ -10,6 +10,7 @@ class PolaritonCondensate:
     Simula um condensado de polaritons como N osciladores coerentes.
     Ref: "Kuramoto model with pump and decay".
     """
+
     def __init__(self, N=64, pump_strength=1.5, coupling=100.0):
         self.N = N
         self.K = coupling
@@ -33,7 +34,7 @@ class PolaritonCondensate:
             self.rho += d_rho
             self.theta += d_theta
             # Manter theta em [0, 2pi)
-            self.theta %= (2 * np.pi)
+            self.theta %= 2 * np.pi
 
         # Calcular parâmetro de ordem ponderado pelas amplitudes
         z = self.rho * np.exp(1j * self.theta)
@@ -55,6 +56,7 @@ Status: {status}
 <|SEAL|> {seal}
 <|ARKHE_END|>"""
         return {"phi_c": phi_c, "decree": decree, "seal": seal}
+
 
 # Exemplo
 if __name__ == "__main__":

@@ -9,15 +9,18 @@ import numpy as np
 try:
     import strawberryfields as sf
     from strawberryfields import ops
+
     SF_AVAILABLE = True
 except ImportError:
     SF_AVAILABLE = False
+
 
 class PhotonicHardwareDriver:
     """
     Camada de abstração para hardware fotônico.
     Suporta Strawberry Fields (Xanadu) e simulação clássica.
     """
+
     def __init__(self, backend="simulator", num_modes=4):
         self.backend = backend
         self.num_modes = num_modes
@@ -54,9 +57,10 @@ class PhotonicHardwareDriver:
         decree = f"<|ARKHE_START|>\n<|SUBSTRATE|> 862.1-PHOTONIC\n<|PHI_C|> {phi_c:.3f}\n<|STATUS|> {status}\n<|SEAL|> {seal}\n<|ARKHE_END|>"
         return {"phi_c": phi_c, "decree": decree, "seal": seal}
 
+
 # Exemplo
 if __name__ == "__main__":
     hw = PhotonicHardwareDriver(backend="simulator")
-    state = hw.create_gaussian_state([0.5]*4, [1.0]*4)
+    state = hw.create_gaussian_state([0.5] * 4, [1.0] * 4)
     phi = hw.measure_coherence(state)
     print(hw.generate_decree(phi)["decree"])

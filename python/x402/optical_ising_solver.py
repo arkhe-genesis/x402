@@ -11,6 +11,7 @@ class OpticalIsingMachine:
     Simula um solver de Ising com spins mapeados em fases de um condensado.
     Minimiza H = - sum_{i<j} J_{ij} cos(theta_i - theta_j)
     """
+
     def __init__(self, spins, coupling_matrix):
         self.N = spins
         self.J = coupling_matrix  # matriz de acoplamento
@@ -23,10 +24,10 @@ class OpticalIsingMachine:
         for _ in range(steps):
             delta = np.subtract.outer(self.theta, self.theta)
             # Acoplamento personalizado
-            coupling = (1.0/self.N) * np.sum(self.J * np.sin(delta), axis=1)
+            coupling = (1.0 / self.N) * np.sum(self.J * np.sin(delta), axis=1)
             d_theta = self.omega * (np.random.randn(self.N)) + coupling * dt
             self.theta += d_theta
-            self.theta %= (2 * np.pi)
+            self.theta %= 2 * np.pi
         # Extrair spins: projeção de theta em binário
         spins = np.sign(np.cos(self.theta))  # +1 ou -1
         # Energia do Ising
@@ -37,6 +38,7 @@ class OpticalIsingMachine:
         seal = hashlib.sha3_256(str(energy).encode()).hexdigest()[:16]
         decree = f"<|ARKHE_START|>\n<|SUBSTRATE|> 862.3-OPTICAL-ISING\n<|PHI_C|> {phi_c:.3f}\n<|ENERGY|> {energy:.4f}\n<|SEAL|> {seal}\n<|ARKHE_END|>"
         return {"spins": spins, "energy": energy, "phi_c": phi_c, "decree": decree, "seal": seal}
+
 
 # Exemplo
 if __name__ == "__main__":
