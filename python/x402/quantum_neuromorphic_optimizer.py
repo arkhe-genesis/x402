@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
 # "quantum_neuromorphic_optimizer.py"
 # Usa VQE para otimizar a matriz de pesos de uma rede neuromórfica
-import numpy as np
 import hashlib
+
+import numpy as np
 
 # Mock Qiskit if not available
 try:
-    from qiskit import QuantumCircuit
-    from qiskit.algorithms import VQE
-    from qiskit.primitives import Estimator
+
+
     from qiskit.circuit.library import EfficientSU2
+
     QISKIT_AVAILABLE = True
 except ImportError:
     QISKIT_AVAILABLE = False
@@ -22,7 +23,7 @@ class QuantumNeuromorphicOptimizer:
 
         if QISKIT_AVAILABLE:
             # Circuito variacional
-            circuit = EfficientSU2(num_neurons, entanglement='circular')
+            EfficientSU2(num_neurons, entanglement='circular')
             # Hamiltoniano: penaliza desvio das taxas alvo
             def hamiltonian(params):
                 # Executa circuito e mede

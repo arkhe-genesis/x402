@@ -11,12 +11,12 @@
 ╚══════════════════════════════════════════════════════════════════════════════╝
 """
 
-import asyncio
 import random
 import time
-from typing import Dict, List, Optional, Any, Tuple
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
+from typing import Any
+
 
 class OrchestrationMode(Enum):
     AUTONOMOUS = "autonomous"
@@ -52,11 +52,11 @@ class BioDigitalHealing:
     """
 
     def __init__(self):
-        self.immune_response: Dict[str, str] = {}
-        self.cell_regeneration_queue: List[str] = []
+        self.immune_response: dict[str, str] = {}
+        self.cell_regeneration_queue: list[str] = []
         self.metabolic_rate = 1.0
 
-    def detect_pathogen(self, substrate_id: str, symptoms: Dict) -> str:
+    def detect_pathogen(self, substrate_id: str, symptoms: dict) -> str:
         """Detecta "patógenos" (falhas) e ativa resposta imunológica."""
         if symptoms["error_rate"] > 0.05:
             response = "circuit_breaker"  # Isolamento
@@ -95,11 +95,11 @@ class ConsciousnessAwareScheduler:
     """
 
     def __init__(self):
-        self.global_workspace: Dict[str, Any] = {}
+        self.global_workspace: dict[str, Any] = {}
         self.phi_threshold = 0.577
-        self.attention_focus: Optional[str] = None
+        self.attention_focus: str | None = None
 
-    def compute_phi(self, nodes: List[Dict]) -> float:
+    def compute_phi(self, nodes: list[dict]) -> float:
         """Calcula Φ (informação integrada) do cluster de nós."""
         if not nodes:
             return 0.0
@@ -110,7 +110,7 @@ class ConsciousnessAwareScheduler:
         phi = connections / max_possible if max_possible > 0 else 0.0
         return phi
 
-    def broadcast(self, information: Dict, priority: float):
+    def broadcast(self, information: dict, priority: float):
         """Broadcast para o workspace global (GWT)."""
         if priority > 0.8:
             self.global_workspace["critical"] = information
@@ -119,7 +119,7 @@ class ConsciousnessAwareScheduler:
         else:
             self.global_workspace["background"] = information
 
-    def predict_and_schedule(self, historical_load: List[float]) -> Dict:
+    def predict_and_schedule(self, historical_load: list[float]) -> dict:
         """Prediz carga futura e agenda recursos."""
         # Média móvel exponencial
         if not historical_load:
@@ -154,7 +154,7 @@ class PolaritonicEdge:
         self.strong_coupling_factor = 0.9  # Analogia: acoplamento forte
         self.condensate_threshold = 0.7
 
-    def process_at_edge(self, task: Dict, latency_requirement: float) -> Tuple[str, float]:
+    def process_at_edge(self, task: dict, latency_requirement: float) -> tuple[str, float]:
         """Processa tarefa no edge com latência mínima."""
         # Seleciona nó mais próximo (menor latência)
         best_node = min(self.edge_nodes,
@@ -165,7 +165,7 @@ class PolaritonicEdge:
 
         return best_node, processing_time
 
-    def form_condensate(self, tasks: List[Dict]) -> Dict:
+    def form_condensate(self, tasks: list[dict]) -> dict:
         """Forma "condensado" de tarefas para processamento em batch."""
         if len(tasks) < 3:
             return {"mode": "individual", "tasks": tasks}
@@ -191,8 +191,8 @@ class RegistryObservability:
     """
 
     def __init__(self):
-        self.registry_metrics: Dict[str, List[float]] = {}
-        self.invocation_traces: List[Dict] = []
+        self.registry_metrics: dict[str, list[float]] = {}
+        self.invocation_traces: list[dict] = []
         self.anomaly_threshold = 0.95
 
     def record_registration(self, tool_id: int, substrate_id: str):
@@ -212,7 +212,7 @@ class RegistryObservability:
         }
         self.invocation_traces.append(trace)
 
-    def detect_anomalies(self) -> List[Dict]:
+    def detect_anomalies(self) -> list[dict]:
         """Detecta anomalias no padrão de invocação."""
         anomalies = []
 
@@ -231,7 +231,7 @@ class RegistryObservability:
         # Latência anormal
         latencies = [t["latency"] for t in recent]
         if latencies:
-            avg_latency = sum(latencies) / len(latencies)
+            sum(latencies) / len(latencies)
             p95 = sorted(latencies)[int(len(latencies) * 0.95)]
             if p95 > 2.0:
                 anomalies.append({
@@ -255,7 +255,7 @@ class SystemDesignOrchestrator:
         self.polaritonic_edge = PolaritonicEdge()
         self.registry_obs = RegistryObservability()
 
-        self.pillars: Dict[str, Dict] = {
+        self.pillars: dict[str, dict] = {
             "873": {"name": "CORE-FOUNDATIONS", "phi_c": 0.885, "healthy": True},
             "874": {"name": "NETWORKING-LAYER", "phi_c": 0.875, "healthy": True},
             "875": {"name": "API-LAYER", "phi_c": 0.880, "healthy": True},
@@ -267,7 +267,7 @@ class SystemDesignOrchestrator:
             "881": {"name": "DEVOPS-DEPLOYMENT", "phi_c": 0.870, "healthy": True},
         }
 
-        self.substrates: Dict[str, Dict] = {
+        self.substrates: dict[str, dict] = {
             "870-G": {"phi_c": 0.870, "type": "gateway"},
             "871": {"phi_c": 0.650, "type": "aerospace"},
             "872": {"phi_c": 0.890, "type": "registry"},

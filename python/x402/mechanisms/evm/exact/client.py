@@ -6,6 +6,7 @@ from datetime import timedelta
 from typing import Any
 
 from x402.schemas import PaymentRequirements
+
 from ..constants import ERC20_ALLOWANCE_ABI, PERMIT2_ADDRESS, SCHEME_EXACT
 from ..eip712 import build_typed_data_for_signing
 from ..signer import (

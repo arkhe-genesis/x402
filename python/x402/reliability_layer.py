@@ -6,11 +6,13 @@
 ╚══════════════════════════════════════════════════════════════════════════════╝
 """
 
-import time
 import random
-from typing import Dict, List, Optional, Callable, Any
+import time
+from collections.abc import Callable
 from dataclasses import dataclass
 from enum import Enum
+from typing import Any
+
 
 class CircuitState(Enum):
     CLOSED = "closed"      # Normal operation
@@ -121,17 +123,17 @@ class DisasterRecovery:
     def __init__(self, rpo_seconds: float = 300, rto_seconds: float = 600):
         self.rpo = rpo_seconds  # Recovery Point Objective
         self.rto = rto_seconds  # Recovery Time Objective
-        self.snapshots: List[Dict] = []
+        self.snapshots: list[dict] = []
         self.last_snapshot_time = 0.0
 
-    def snapshot(self, data: Dict):
+    def snapshot(self, data: dict):
         self.snapshots.append({
             "timestamp": time.time(),
             "data": data.copy()
         })
         self.last_snapshot_time = time.time()
 
-    def recover(self, target_time: float = None) -> Optional[Dict]:
+    def recover(self, target_time: float = None) -> dict | None:
         if not self.snapshots:
             return None
 
@@ -152,10 +154,10 @@ class DisasterRecovery:
 class HighAvailabilityCluster:
     """Cluster de alta disponibilidade."""
 
-    def __init__(self, nodes: List[str]):
+    def __init__(self, nodes: list[str]):
         self.nodes = nodes
         self.active_nodes = set(nodes)
-        self.failover_history: List[Dict] = []
+        self.failover_history: list[dict] = []
 
     def health_check(self):
         """Simula health checks e remove nós falhos."""
@@ -168,7 +170,7 @@ class HighAvailabilityCluster:
                     "timestamp": time.time()
                 })
 
-    def get_active_node(self) -> Optional[str]:
+    def get_active_node(self) -> str | None:
         if not self.active_nodes:
             return None
         return random.choice(list(self.active_nodes))
@@ -198,7 +200,7 @@ if __name__ == "__main__":
     try:
         result = retry.execute(flaky_service)
         print(f"[Retry] Success: {result}")
-    except:
+    except Exception:
         print("[Retry] All retries exhausted")
 
     # Test Backpressure

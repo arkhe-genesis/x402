@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # "photonic_hardware_driver.py" — Substrato 862.1
 # Interface para hardware fotônico (Xanadu Strawberry Fields, simulação pura)
-import numpy as np
 import hashlib
-from typing import Optional
+
+import numpy as np
 
 # Tentar importar Strawberry Fields; se não disponível, usar simulador clássico
 try:
@@ -30,8 +30,8 @@ class PhotonicHardwareDriver:
         """Prepara um estado Gaussiano com squeezing e deslocamento."""
         if self.engine is not None:
             self.q = self.engine.register(num_subsystems=self.num_modes)
-            with self.q as prog:
-                for i, (s, d) in enumerate(zip(squeezings, displacements)):
+            with self.q:
+                for i, (s, d) in enumerate(zip(squeezings, displacements, strict=False)):
                     ops.Sgate(s) | self.q[i]
                     ops.Dgate(d) | self.q[i]
             return self.q

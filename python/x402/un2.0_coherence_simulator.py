@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 # "un2.0_coherence_simulator.py" — Substrato 861
 # Simulador de Coerência dos ODS (Kuramoto)
-import numpy as np
 import hashlib
+
+import numpy as np
+
 
 class UN20CoherenceEngine:
     """
@@ -18,7 +20,7 @@ class UN20CoherenceEngine:
 
     def step(self, steps=1000):
         """Avança a simulação e calcula a coerência Φ dos ODS."""
-        for t in range(steps):
+        for _t in range(steps):
             delta = np.subtract.outer(self.theta, self.theta)
             coupling = (self.K / self.N) * np.sum(np.sin(delta), axis=1)
             self.theta += 0.01 * (self.omega + coupling)

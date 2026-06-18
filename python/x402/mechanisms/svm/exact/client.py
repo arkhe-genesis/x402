@@ -18,6 +18,7 @@ except ImportError as e:
     ) from e
 
 from x402.schemas import PaymentRequirements
+
 from ..constants import (
     COMPUTE_BUDGET_PROGRAM_ADDRESS,
     DEFAULT_COMPUTE_UNIT_LIMIT,

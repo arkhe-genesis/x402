@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 # "polaritonic_snn_trainer.py" — Substrato 862.2
 # Treinamento de SNNs com neurônios cuja dinâmica simula condensados polaritônicos
-import numpy as np
-from scipy.integrate import solve_ivp
 import hashlib
+
+import numpy as np
+
 
 class PolaritonicNeuron:
     """Neurônio spiking cuja membrana segue a equação de Gross-Pitaevskii simplificada."""
@@ -39,8 +40,8 @@ class PolaritonicSNN:
         for t in range(1, steps):
             for i, neuron in enumerate(self.neurons):
                 # corrente = entrada externa + soma pós-sináptica
-                I = input_signal[i, t] + np.dot(self.weights[i, :], spikes[:, t-1])
-                spikes[i, t] = neuron.step(I)
+                i_input = input_signal[i, t] + np.dot(self.weights[i, :], spikes[:, t-1])
+                spikes[i, t] = neuron.step(i_input)
         # Treino simples: STDP
         for i in range(self.num):
             for j in range(self.num):

@@ -1,4 +1,5 @@
 import os
+
 from eth_hash.auto import keccak
 
 N = 16

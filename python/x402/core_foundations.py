@@ -7,12 +7,11 @@
 ╚══════════════════════════════════════════════════════════════════════════════╝
 """
 
-import asyncio
 import random
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Callable
-from enum import Enum
 from datetime import datetime
+from enum import Enum
+
 
 class ScalingMode(Enum):
     HORIZONTAL = "horizontal"
@@ -40,12 +39,12 @@ class CAPTheorem:
 
     def __init__(self, preference: str = "CP"):
         self.preference = preference  # CP, AP, or CA (impossible in distributed)
-        self.partitions: List[List[SystemNode]] = []
+        self.partitions: list[list[SystemNode]] = []
 
-    def simulate_partition(self, nodes: List[SystemNode], partition_indices: List[int]):
+    def simulate_partition(self, nodes: list[SystemNode], partition_indices: list[int]):
         """Simula uma partição de rede e aplica a preferência CAP."""
         partition_a = [n for i, n in enumerate(nodes) if i in partition_indices]
-        partition_b = [n for i, n in enumerate(nodes) if i not in partition_indices]
+        [n for i, n in enumerate(nodes) if i not in partition_indices]
 
         if self.preference == "CP":
             # Sacrifica disponibilidade para manter consistência
@@ -61,16 +60,16 @@ class CAPTheorem:
 class SelfHealingSystem:
     """Sistema auto-curativo com detecção de falhas e recuperação."""
 
-    def __init__(self, nodes: List[SystemNode]):
+    def __init__(self, nodes: list[SystemNode]):
         self.nodes = nodes
-        self.failure_history: List[Dict] = []
+        self.failure_history: list[dict] = []
 
-    def detect_failures(self) -> List[SystemNode]:
+    def detect_failures(self) -> list[SystemNode]:
         """Detecta nós com utilização > 90% ou marcados como unhealthy."""
         failed = [n for n in self.nodes if n.utilization > 0.9 or not n.healthy]
         return failed
 
-    def heal(self, strategy: str = "restart") -> Dict:
+    def heal(self, strategy: str = "restart") -> dict:
         """Aplica estratégia de cura aos nós falhos."""
         failed = self.detect_failures()
         healed_count = 0
@@ -99,7 +98,7 @@ class SelfHealingSystem:
 class AINativeScheduler:
     """Scheduler AI-native para alocação de recursos."""
 
-    def __init__(self, nodes: List[SystemNode]):
+    def __init__(self, nodes: list[SystemNode]):
         self.nodes = nodes
         self.predictive_model = {}  # Simplified: load prediction
 
@@ -110,7 +109,7 @@ class AINativeScheduler:
         predicted = node.utilization + trend * horizon_minutes
         return max(0.0, min(1.0, predicted))
 
-    def schedule(self, task_load: float) -> Optional[SystemNode]:
+    def schedule(self, task_load: float) -> SystemNode | None:
         """Aloca tarefa ao nó com menor utilização prevista."""
         predictions = [(n, self.predict_load(n.id)) for n in self.nodes if n.healthy]
         if not predictions:
