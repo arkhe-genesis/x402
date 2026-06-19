@@ -2,10 +2,10 @@
 
 use solana_client::rpc_client::RpcClient;
 use solana_sdk::{
+    instruction::{AccountMeta, Instruction},
     pubkey::Pubkey,
     signature::{Keypair, Signer},
     transaction::Transaction,
-    instruction::{Instruction, AccountMeta},
 };
 // use borsh::{BorshSerialize, BorshDeserialize};
 
@@ -27,7 +27,11 @@ impl SolanaAgentClient {
     }
 
     /// Inicializa um agente na Solana
-    pub async fn initialize_agent(&self, agent_id: [u8; 32], _arweave_txid: [u8; 32]) -> Result<Pubkey, String> {
+    pub async fn initialize_agent(
+        &self,
+        agent_id: [u8; 32],
+        _arweave_txid: [u8; 32],
+    ) -> Result<Pubkey, String> {
         // Calcular PDA do agente
         let (pda, _bump) = Pubkey::find_program_address(&[b"agent", &agent_id], &self.program_id);
 

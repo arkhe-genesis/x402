@@ -2,11 +2,11 @@
 //! Usa Llama para tokenização + arcode para codificação aritmética baseada em probabilidades.
 //! Suporte a ZK-proof via RISC Zero.
 
+use crate::agent_loop::{AgentError, AgentResult, CathedralAgent};
+use crate::orchestrator::AgentId;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use crate::agent_loop::{CathedralAgent, AgentResult, AgentError};
-use crate::orchestrator::AgentId;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LlamaZipConfig {
@@ -66,7 +66,7 @@ impl LlamaZipAgent {
     async fn tokenize(&self, text: &str) -> Result<Vec<u32>, String> {
         // Chamada HTTP ao servidor llama.cpp / vLLM que retorna tokens
         let response = reqwest::Client::new()
-            .post(&format!("{}/tokenize", self.config.llama_server_url))
+            .post(format!("{}/tokenize", self.config.llama_server_url))
             .json(&serde_json::json!({ "content": text }))
             .send()
             .await
@@ -84,7 +84,10 @@ impl LlamaZipAgent {
     }
 
     /// Obtém distribuição de probabilidade para cada token (stub)
-    async fn get_token_probabilities(&self, tokens: &[u32]) -> Result<Vec<HashMap<u64, f64>>, String> {
+    async fn get_token_probabilities(
+        &self,
+        tokens: &[u32],
+    ) -> Result<Vec<HashMap<u64, f64>>, String> {
         // Placeholder: distribuição uniforme
         // Em produção: integrar com servidor que retorna logits e aplicar softmax
         let mut result = Vec::new();
@@ -117,7 +120,10 @@ impl CathedralAgent for LlamaZipAgent {
                 let compressed = self.compress(data).await?;
                 format!("compressed_len={}", compressed.len())
             }
-            "decompress" => self.decompress(data).await.map(|t| format!("decompressed: {}", String::from_utf8_lossy(&t)))?,
+            "decompress" => self
+                .decompress(data)
+                .await
+                .map(|t| format!("decompressed: {}", String::from_utf8_lossy(&t)))?,
             _ => return Err(AgentError::ToolError("Unknown command".into())),
         };
 

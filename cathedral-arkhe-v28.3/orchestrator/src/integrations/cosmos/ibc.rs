@@ -10,7 +10,12 @@ pub struct IbcAgentRegistry {
 }
 
 impl IbcAgentRegistry {
-    pub async fn register_agent(&self, agent_id: &str, arweave_txid: &str, pubkey: &str) -> Result<(), String> {
+    pub async fn register_agent(
+        &self,
+        agent_id: &str,
+        arweave_txid: &str,
+        pubkey: &str,
+    ) -> Result<(), String> {
         let msg = format!(
             r#"{{"register":{{"agent_id":"{}","arweave_txid":"{}","public_key":"{}"}}}}"#,
             agent_id, arweave_txid, pubkey
