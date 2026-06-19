@@ -43,9 +43,7 @@ impl MemoTracer {
     /// Resolve memo para Action original
     pub async fn resolve_memo(&self, memo: [u8; 32]) -> Result<Option<Action>, TracerError> {
         // Busca no EventStore por evento com este memo
-        let events = self.event_store
-            .query_by_memo(&hex::encode(memo))
-            .await?;
+        let events = self.event_store.query_by_memo(&hex::encode(memo)).await?;
 
         if let Some(event) = events.first() {
             if let OrchestratorEvent::ActionProposed { action, .. } = &event.payload {

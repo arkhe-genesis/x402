@@ -6,12 +6,15 @@ pub struct B20SettlementEngine {
     compliance_engine: Arc<ComplianceEngine>,
     batch_engine: Arc<BatchSettlementEngine>, // Substrato 7001
     cross_chain_emitter: Arc<CrossChainEmitterV2>, // Substrato 4003
-    zk_prover: Arc<HybridZkVerifier>, // Substrato 4003
+    zk_prover: Arc<HybridZkVerifier>,         // Substrato 4003
 }
 
 impl B20SettlementEngine {
     /// Processa batch de pagamentos B20 com compliance completa
-    pub async fn settle_batch(&self, batch: &B20PaymentBatch) -> Result<SettlementReceipt, SettlementError> {
+    pub async fn settle_batch(
+        &self,
+        batch: &B20PaymentBatch,
+    ) -> Result<SettlementReceipt, SettlementError> {
         // 1. Agrupa por token e verifica compliance
         let mut compliant_payments = Vec::new();
         let mut rejected = Vec::new();
@@ -27,13 +30,16 @@ impl B20SettlementEngine {
                     rejected.push((payment.id.clone(), verdict));
                 }
                 Err(e) => {
-                    rejected.push((payment.id.clone(), ComplianceVerdict {
-                        ethical: EthicalCompliance::Failed(vec![]),
-                        policy: PolicyCompliance::Denied(e.to_string()),
-                        pause: PauseCompliance::Passed,
-                        role: RoleCompliance::Passed,
-                        overall: false,
-                    }));
+                    rejected.push((
+                        payment.id.clone(),
+                        ComplianceVerdict {
+                            ethical: EthicalCompliance::Failed(vec![]),
+                            policy: PolicyCompliance::Denied(e.to_string()),
+                            pause: PauseCompliance::Passed,
+                            role: RoleCompliance::Passed,
+                            overall: false,
+                        },
+                    ));
                 }
             }
         }
@@ -66,33 +72,47 @@ impl B20SettlementEngine {
             timestamp: chrono::Utc::now().timestamp(),
         };
 
-        self.cross_chain_emitter.emit_cross_chain(
-            OrchestratorEvent::B20BatchSettled {
+        self.cross_chain_emitter
+            .emit_cross_chain(OrchestratorEvent::B20BatchSettled {
                 batch_id: batch.id.clone(),
                 receipt: receipt.clone(),
                 timestamp: chrono::Utc::now().timestamp(),
-            }
-        ).await?;
+            })
+            .await?;
 
         Ok(receipt)
     }
 
     async fn execute_b20_operation(&self, op: &B20Operation) -> Result<String, SettlementError> {
         match op {
-            B20Operation::Transfer { token, from, to, amount, memo, .. } => {
+            B20Operation::Transfer {
+                token,
+                from,
+                to,
+                amount,
+                memo,
+                ..
+            } => {
                 let b20 = IB20::new(*token, self.provider.clone());
 
-                let mut tx = b20.method::<_, ()>("transferWithMemo", (*to, *amount, memo.unwrap_or([0; 32])))?;
+                let mut tx = b20
+                    .method::<_, ()>("transferWithMemo", (*to, *amount, memo.unwrap_or([0; 32])))?;
 
                 let pending = tx.send().await?;
                 let receipt = pending.await?;
 
                 Ok(format!("{:?}", receipt.transaction_hash))
             }
-            B20Operation::Mint { token, to, amount, memo } => {
+            B20Operation::Mint {
+                token,
+                to,
+                amount,
+                memo,
+            } => {
                 let b20 = IB20::new(*token, self.provider.clone());
 
-                let tx = b20.method::<_, ()>("mintWithMemo", (*to, *amount, memo.unwrap_or([0; 32])))?;
+                let tx =
+                    b20.method::<_, ()>("mintWithMemo", (*to, *amount, memo.unwrap_or([0; 32])))?;
                 let pending = tx.send().await?;
                 let receipt = pending.await?;
 

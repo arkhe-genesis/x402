@@ -67,6 +67,9 @@ async fn test_b20_xrpl_bridge() {
     assert!(!escrow_id.is_empty());
 
     // Simula liberação do escrow XRPL
-    let release_tx = bridge.xrpl_to_b20_release(&escrow_id, payment.to).await.unwrap();
+    let release_tx = bridge
+        .xrpl_to_b20_release(&escrow_id, payment.to)
+        .await
+        .unwrap();
     assert!(!release_tx.is_empty());
 }
