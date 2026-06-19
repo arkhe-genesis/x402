@@ -1,7 +1,7 @@
 // src/integrations/oracles.rs
 
 use reqwest::Client;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PriceData {
@@ -37,8 +37,9 @@ impl AproOracle {
     }
 
     pub async fn get_ai_insight(&self, prompt: &str) -> Result<AiInsight, String> {
-        let resp = self.client
-            .post(&format!("{}/ai/insight", self.api_url))
+        let resp = self
+            .client
+            .post(format!("{}/ai/insight", self.api_url))
             .header("Authorization", &self.api_key)
             .json(&serde_json::json!({ "prompt": prompt }))
             .send()
@@ -70,7 +71,12 @@ impl DiaOracle {
 
     pub async fn get_price(&self, asset: &str) -> Result<PriceData, String> {
         let url = format!("{}/price/{}", self.api_url, asset);
-        let resp = self.client.get(&url).send().await.map_err(|e| e.to_string())?;
+        let resp = self
+            .client
+            .get(&url)
+            .send()
+            .await
+            .map_err(|e| e.to_string())?;
         let data: serde_json::Value = resp.json().await.map_err(|e| e.to_string())?;
         Ok(PriceData {
             asset: asset.to_string(),
@@ -95,7 +101,10 @@ impl AGIOracle {
 
     pub async fn get_combined_insight(&self, asset: &str) -> Result<PriceData, String> {
         let price_data = self.dia.get_price(asset).await?;
-        let _insight = self.apro.get_ai_insight(&format!("Analyze {} price: {}", asset, price_data.price)).await?;
+        let _insight = self
+            .apro
+            .get_ai_insight(&format!("Analyze {} price: {}", asset, price_data.price))
+            .await?;
         // Combina dados
         let mut combined = price_data;
         combined.confidence = 0.95; // Ajuste baseado no insight

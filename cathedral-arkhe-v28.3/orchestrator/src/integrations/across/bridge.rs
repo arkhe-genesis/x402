@@ -2,7 +2,7 @@
 //! Across Protocol bridge para pagamentos cross-chain USDC
 
 use reqwest::Client;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 // use std::collections::HashMap;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -17,10 +17,10 @@ pub struct AcrossQuote {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AcrossIntent {
-    pub from_chain: u64,          // 1 = Ethereum, 137 = Polygon, 8453 = Base
+    pub from_chain: u64, // 1 = Ethereum, 137 = Polygon, 8453 = Base
     pub to_chain: u64,
-    pub amount: u64,              // em unidades (6 decimais)
-    pub recipient: String,        // Endereço destino
+    pub amount: u64,       // em unidades (6 decimais)
+    pub recipient: String, // Endereço destino
     pub referrer: Option<String>,
 }
 
@@ -40,12 +40,22 @@ impl AcrossClient {
     }
 
     /// Obtém cotação para uma ponte USDC
-    pub async fn get_quote(&self, from_chain: u64, to_chain: u64, amount: u64) -> Result<AcrossQuote, String> {
+    pub async fn get_quote(
+        &self,
+        from_chain: u64,
+        to_chain: u64,
+        amount: u64,
+    ) -> Result<AcrossQuote, String> {
         let url = format!(
             "{}/quotes?fromChain={}&toChain={}&amount={}&asset=USDC",
             self.api_url, from_chain, to_chain, amount
         );
-        let resp = self.client.get(&url).send().await.map_err(|e| e.to_string())?;
+        let resp = self
+            .client
+            .get(&url)
+            .send()
+            .await
+            .map_err(|e| e.to_string())?;
         let quote: AcrossQuote = resp.json().await.map_err(|e| e.to_string())?;
         Ok(quote)
     }
@@ -62,7 +72,13 @@ impl AcrossClient {
             "recipient": intent.recipient,
             "referrer": intent.referrer,
         });
-        let resp = self.client.post(&url).json(&payload).send().await.map_err(|e| e.to_string())?;
+        let resp = self
+            .client
+            .post(&url)
+            .json(&payload)
+            .send()
+            .await
+            .map_err(|e| e.to_string())?;
         let data: serde_json::Value = resp.json().await.map_err(|e| e.to_string())?;
         let tx_hash = data["transactionHash"].as_str().unwrap_or("").to_string();
         Ok(tx_hash)

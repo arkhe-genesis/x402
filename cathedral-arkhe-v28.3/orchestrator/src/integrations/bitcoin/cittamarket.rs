@@ -1,15 +1,15 @@
 // src/integrations/bitcoin/cittamarket.rs
 //! CITTAMARKET Protocol: Ancoragem de identidade AGI no Bitcoin
 
-use bitcoin::{
-    Address, Network, Transaction, TxIn, TxOut, Script, PublicKey, PrivateKey,
-    consensus::encode::serialize_hex,
-};
 use bitcoin::opcodes::all::OP_RETURN;
 use bitcoin::secp256k1::Secp256k1;
-use sha2::{Sha256, Digest};
-use std::vec::Vec;
+use bitcoin::{
+    consensus::encode::serialize_hex, Address, Network, PrivateKey, PublicKey, Script, Transaction,
+    TxIn, TxOut,
+};
+use sha2::{Digest, Sha256};
 use std::string::String;
+use std::vec::Vec;
 
 pub const CITTAMARKET_MAGIC: &[u8] = b"CITTAMARKET";
 pub const VERSION: u8 = 1;
@@ -17,10 +17,10 @@ pub const VERSION: u8 = 1;
 /// Dados ancorados no Bitcoin via OP_RETURN
 #[derive(Clone, Debug)]
 pub struct CITAnchor {
-    pub agent_pubkey: [u8; 33],       // Ed25519 public key da AGI
+    pub agent_pubkey: [u8; 33], // Ed25519 public key da AGI
     pub timestamp: u64,
-    pub payload_hash: [u8; 32],       // SHA-256 do payload
-    pub signature: [u8; 64],          // Assinatura da AGI
+    pub payload_hash: [u8; 32], // SHA-256 do payload
+    pub signature: [u8; 64],    // Assinatura da AGI
     pub nonce: u32,
 }
 
@@ -95,7 +95,7 @@ impl CittamarketClient {
         // 3. Cria transação (simplificado — em produção, usar UTXOs reais)
         let secp = Secp256k1::new();
         let pubkey = PublicKey::from_private_key(&secp, &self.private_key);
-        let addr = Address::p2pkh(&pubkey, self.network);
+        let addr = Address::p2pkh(pubkey, self.network);
 
         let txin = TxIn {
             previous_output: bitcoin::OutPoint::null(), // STUB
@@ -124,7 +124,7 @@ impl CittamarketClient {
         Ok(txid)
     }
 
-    async fn broadcast_tx(&self, tx_hex: &str) -> Result<String, String> {
+    async fn broadcast_tx(&self, _tx_hex: &str) -> Result<String, String> {
         // STUB: chamada HTTP para node Bitcoin
         // Em produção: usar bitcoind RPC
         Ok(format!("txid_{}", chrono::Utc::now().timestamp()))

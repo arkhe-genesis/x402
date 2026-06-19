@@ -8,7 +8,7 @@
 //         crypto::{Secp256k1PrivateKey, Secp256k1PublicKey},
 //     },
 // };
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 pub struct Address {
     pub value: String,
@@ -21,9 +21,9 @@ pub struct Identity {}
 pub struct ASIAgentConfig {
     pub name: String,
     pub description: String,
-    pub token_id: String,          // dPID da AGI
-    pub arweave_txid: String,      // Documento de identidade
-    pub owner_key: Vec<u8>,        // Chave privada (em produção, via TEE)
+    pub token_id: String,     // dPID da AGI
+    pub arweave_txid: String, // Documento de identidade
+    pub owner_key: Vec<u8>,   // Chave privada (em produção, via TEE)
 }
 
 pub struct ASIAgentDeployer {

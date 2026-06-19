@@ -1,7 +1,7 @@
 // src/multi_chain/executor.rs
 
-use async_trait::async_trait;
 use crate::integrations::across::bridge::{AcrossClient, AcrossIntent};
+use async_trait::async_trait;
 
 pub struct TxReceipt {
     pub hash: String,
@@ -12,7 +12,11 @@ pub struct LiFiClient {}
 
 #[async_trait]
 pub trait CrossChainExecutor {
-    async fn execute_cross_chain(&self, chain: ChainId, action: Action) -> Result<TxReceipt, String>;
+    async fn execute_cross_chain(
+        &self,
+        chain: ChainId,
+        action: Action,
+    ) -> Result<TxReceipt, String>;
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -55,7 +59,11 @@ impl CrossChainAgent {
         Ok("Solana executed".to_string())
     }
 
-    async fn execute_bridge(&self, target_chain: ChainId, action: Action) -> Result<String, String> {
+    async fn execute_bridge(
+        &self,
+        target_chain: ChainId,
+        action: Action,
+    ) -> Result<String, String> {
         // Usa Across para enviar intents para outras chains
         let intent = AcrossIntent {
             from_chain: 8453, // Base (origem)

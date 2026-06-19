@@ -53,3 +53,5 @@ pub mod multi_chain {
     pub mod agent;
     pub mod executor;
 }
+pub mod substrato_5002;
+pub mod substrato_9000;

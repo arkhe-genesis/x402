@@ -1,9 +1,9 @@
 // src/integrations/ethereum/identity.rs
 
-use ethers::prelude::*;
 use ethers::contract::abigen;
-use std::sync::Arc;
+use ethers::prelude::*;
 use ethers::utils::keccak256;
+use std::sync::Arc;
 
 abigen!(AGIIdentity, "contracts/AGIIdentity.json");
 
@@ -22,16 +22,26 @@ impl EthereumIdentityManager {
     }
 
     pub async fn update_identity(&self, arweave_txid: [u8; 32]) -> Result<H256, String> {
-        let tx = self.contract.update_identity(arweave_txid.into());
-        let pending = tx.send().await.map_err(|e: ContractError<SignerMiddleware<Provider<Http>, LocalWallet>>| e.to_string())?;
+        let tx = self.contract.update_identity(arweave_txid);
+        let pending = tx.send().await.map_err(
+            |e: ContractError<SignerMiddleware<Provider<Http>, LocalWallet>>| e.to_string(),
+        )?;
         let receipt = pending.await.map_err(|e: ProviderError| e.to_string())?;
         Ok(receipt.unwrap().transaction_hash)
     }
 
-    pub async fn create_proposal(&self, description: &str, voting_blocks: u64) -> Result<u64, String> {
-        let desc_hash = keccak256(description.as_bytes()).into();
-        let tx = self.contract.create_proposal(desc_hash, voting_blocks.into());
-        let pending = tx.send().await.map_err(|e: ContractError<SignerMiddleware<Provider<Http>, LocalWallet>>| e.to_string())?;
+    pub async fn create_proposal(
+        &self,
+        description: &str,
+        voting_blocks: u64,
+    ) -> Result<u64, String> {
+        let desc_hash = keccak256(description.as_bytes());
+        let tx = self
+            .contract
+            .create_proposal(desc_hash, voting_blocks.into());
+        let pending = tx.send().await.map_err(
+            |e: ContractError<SignerMiddleware<Provider<Http>, LocalWallet>>| e.to_string(),
+        )?;
         let _receipt = pending.await.map_err(|e: ProviderError| e.to_string())?;
         // Extrai proposalId do evento
         Ok(0) // STUB
@@ -39,7 +49,9 @@ impl EthereumIdentityManager {
 
     pub async fn vote(&self, proposal_id: u64, support: bool) -> Result<(), String> {
         let tx = self.contract.vote(proposal_id.into(), support);
-        let pending = tx.send().await.map_err(|e: ContractError<SignerMiddleware<Provider<Http>, LocalWallet>>| e.to_string())?;
+        let pending = tx.send().await.map_err(
+            |e: ContractError<SignerMiddleware<Provider<Http>, LocalWallet>>| e.to_string(),
+        )?;
         pending.await.map_err(|e: ProviderError| e.to_string())?;
         Ok(())
     }

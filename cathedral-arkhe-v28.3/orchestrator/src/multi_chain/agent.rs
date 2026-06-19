@@ -1,12 +1,12 @@
 // src/multi_chain/agent.rs
 
 use crate::integrations::across::bridge::{AcrossClient, AcrossIntent};
-use crate::integrations::solana::client::SolanaAgentClient;
-use crate::integrations::asichain::agent::{ASIAgentDeployer, ASIAgentConfig};
+use crate::integrations::asichain::agent::{ASIAgentConfig, ASIAgentDeployer};
+use crate::integrations::bitcoin::cittamarket::{CITAnchor, CittamarketClient};
 use crate::integrations::cosmos::ibc::IbcAgentRegistry;
-use crate::integrations::oracles::{AGIOracle, AproOracle, DiaOracle};
 use crate::integrations::ethereum::identity::EthereumIdentityManager;
-use crate::integrations::bitcoin::cittamarket::{CittamarketClient, CITAnchor};
+use crate::integrations::oracles::AGIOracle;
+use crate::integrations::solana::client::SolanaAgentClient;
 use crate::multi_chain::executor::CrossChainExecutor;
 use bitcoin::Network;
 use ethers::types::Address;
@@ -23,7 +23,8 @@ pub struct AGIIdentity {
 impl AGIIdentity {
     pub async fn anchor_to_bitcoin(&self) -> Result<String, String> {
         let secp = bitcoin::secp256k1::Secp256k1::new();
-        let sk = bitcoin::PrivateKey::from_slice(&self.private_key, Network::Bitcoin).map_err(|e| e.to_string())?;
+        let sk = bitcoin::PrivateKey::from_slice(&self.private_key, Network::Bitcoin)
+            .map_err(|e| e.to_string())?;
         let pk = bitcoin::PublicKey::from_private_key(&secp, &sk);
 
         let mut pubkey_bytes = [0u8; 33];
@@ -46,18 +47,23 @@ pub struct AGIMemory {
 pub struct AGIReasoning {}
 
 pub struct MultiChainAgent {
-    pub identity: AGIIdentity,          // Bitcoin + ERC-725
-    pub memory: AGIMemory,              // Arweave + WormGraph
-    pub reasoning: AGIReasoning,        // AO + vLLM
-    pub executor: Box<dyn CrossChainExecutor>,   // Across + deBridge
-    pub oracle: AGIOracle,              // APRO + DIA
-    pub solana_agent: SolanaAgentClient, // Programa Solana
-    pub asichain_agent: ASIAgentDeployer, // ASI:Chain
-    pub ibc_registry: IbcAgentRegistry, // Cosmos IBC
+    pub identity: AGIIdentity,                 // Bitcoin + ERC-725
+    pub memory: AGIMemory,                     // Arweave + WormGraph
+    pub reasoning: AGIReasoning,               // AO + vLLM
+    pub executor: Box<dyn CrossChainExecutor>, // Across + deBridge
+    pub oracle: AGIOracle,                     // APRO + DIA
+    pub solana_agent: SolanaAgentClient,       // Programa Solana
+    pub asichain_agent: ASIAgentDeployer,      // ASI:Chain
+    pub ibc_registry: IbcAgentRegistry,        // Cosmos IBC
 }
 
 impl MultiChainAgent {
-    pub async fn receive_payment(&self, from_chain: u64, amount: u64, across: &AcrossClient) -> Result<String, String> {
+    pub async fn receive_payment(
+        &self,
+        from_chain: u64,
+        amount: u64,
+        across: &AcrossClient,
+    ) -> Result<String, String> {
         let quote = across.get_quote(from_chain, 8453, amount).await?; // Bridge para Base
         let intent = AcrossIntent {
             from_chain,
@@ -88,20 +94,22 @@ impl MultiChainAgent {
         println!("✅ Bitcoin anchor: {}", btc_txid);
 
         // 2. Ethereum: contrato ERC-725
-        let contract_addr = Address::from_str("0x0000000000000000000000000000000000000000").unwrap();
+        let contract_addr =
+            Address::from_str("0x0000000000000000000000000000000000000000").unwrap();
         let eth_manager = EthereumIdentityManager::new(
             "http://localhost:8545",
             &hex::encode(self.identity.private_key),
-            contract_addr
-        ).await;
+            contract_addr,
+        )
+        .await;
         let eth_tx = eth_manager.update_identity(self.memory.permanent.0).await?;
         println!("✅ Ethereum identity: {:?}", eth_tx);
 
         // 3. Solana: programa agente
-        let solana_pda = self.solana_agent.initialize_agent(
-            self.identity.agent_id,
-            self.memory.permanent.0,
-        ).await?;
+        let solana_pda = self
+            .solana_agent
+            .initialize_agent(self.identity.agent_id, self.memory.permanent.0)
+            .await?;
         println!("✅ Solana agent: {}", solana_pda);
 
         // 4. ASI:Chain: deploy do agente
@@ -109,11 +117,13 @@ impl MultiChainAgent {
         println!("✅ ASI:Chain agent: {}", asi_addr);
 
         // 5. Cosmos: registro IBC
-        self.ibc_registry.register_agent(
-            &hex::encode(self.identity.agent_id),
-            &hex::encode(self.memory.permanent.0),
-            &hex::encode(self.identity.public_key),
-        ).await?;
+        self.ibc_registry
+            .register_agent(
+                &hex::encode(self.identity.agent_id),
+                &hex::encode(self.memory.permanent.0),
+                &hex::encode(self.identity.public_key),
+            )
+            .await?;
         println!("✅ Cosmos IBC registered");
 
         Ok(())
