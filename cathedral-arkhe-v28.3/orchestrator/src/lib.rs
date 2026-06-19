@@ -54,3 +54,4 @@ pub mod multi_chain {
     pub mod executor;
 }
 pub mod substrato_4004;
+pub mod substrato_8000;
