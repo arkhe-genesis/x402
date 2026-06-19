@@ -9,14 +9,14 @@
 //!
 //! Selo: CATHEDRAL-ARKHE-8000-CIRCUIT-BREAKER-v2.1.0-2026-06-19
 
+use serde::{Deserialize, Serialize};
 use std::collections::VecDeque;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
-use tokio::sync::{RwLock, mpsc};
-use tokio::time::sleep;
-use tracing::{info, warn, error, debug};
-use serde::{Deserialize, Serialize};
 use thiserror::Error;
+use tokio::sync::{mpsc, RwLock};
+use tokio::time::sleep;
+use tracing::{debug, error, info, warn};
 
 // Define these here since we don't have the real crates
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -117,7 +117,9 @@ impl CircuitBreakerV2 {
             config: config.clone(),
             state: Arc::new(RwLock::new(CircuitState::Closed)),
             metrics: Arc::new(RwLock::new(CircuitMetrics::default())),
-            failure_history: Arc::new(RwLock::new(VecDeque::with_capacity(config.max_history_size))),
+            failure_history: Arc::new(RwLock::new(VecDeque::with_capacity(
+                config.max_history_size,
+            ))),
             consecutive_successes: Arc::new(RwLock::new(0)),
             open_since: Arc::new(RwLock::new(None)),
             dlq_tx,
@@ -216,9 +218,14 @@ impl CircuitBreakerV2 {
             return;
         }
 
-        if state == CircuitState::Closed && history.len() >= self.config.failure_threshold as usize {
+        if state == CircuitState::Closed && history.len() >= self.config.failure_threshold as usize
+        {
             self.transition_to(CircuitState::Open).await;
-            warn!("🔴 Circuito aberto para {} ({} falhas)", self.component, history.len());
+            warn!(
+                "🔴 Circuito aberto para {} ({} falhas)",
+                self.component,
+                history.len()
+            );
         }
     }
 
@@ -228,7 +235,10 @@ impl CircuitBreakerV2 {
             return;
         }
 
-        info!("🔀 Circuit Breaker ({}) {:?} → {:?}", self.component, *state, new_state);
+        info!(
+            "🔀 Circuit Breaker ({}) {:?} → {:?}",
+            self.component, *state, new_state
+        );
 
         *state = new_state;
 
@@ -250,7 +260,11 @@ impl CircuitBreakerV2 {
     // 4. MANUSEIO DE FALHA: DLQ → RETRY → LAST-EFFORT (SEQUENCIAL)
     // ================================================================
 
-    async fn handle_failure_sequential<E: std::fmt::Display + Clone>(&self, error_msg: &str, error: &E) {
+    async fn handle_failure_sequential<E: std::fmt::Display + Clone>(
+        &self,
+        error_msg: &str,
+        error: &E,
+    ) {
         let mut retry_count = 0;
         let last_error = error_msg.to_string();
 
@@ -258,7 +272,10 @@ impl CircuitBreakerV2 {
         while retry_count < self.config.max_retries {
             retry_count += 1;
             let delay = self.config.retry_delay_ms * (2u64.pow(retry_count - 1));
-            info!("🔄 Retry {}/{} para {} (delay {}ms)", retry_count, self.config.max_retries, self.component, delay);
+            info!(
+                "🔄 Retry {}/{} para {} (delay {}ms)",
+                retry_count, self.config.max_retries, self.component, delay
+            );
             sleep(Duration::from_millis(delay)).await;
 
             // Simula re-tentativa (aqui o caller reexecutaria a operação)
@@ -270,7 +287,11 @@ impl CircuitBreakerV2 {
         // 2. Constrói mensagem com payload real
         let payload = self.serialize_payload(error);
         let dlq_msg = DlqMessage {
-            id: format!("cb_{}_{}", self.component, chrono::Utc::now().timestamp_millis()),
+            id: format!(
+                "cb_{}_{}",
+                self.component,
+                chrono::Utc::now().timestamp_millis()
+            ),
             original_id: format!("circuit_breaker_{}", self.component),
             payload: payload.clone(),
             error_type: "circuit_breaker_failure".to_string(),
@@ -333,7 +354,10 @@ impl CircuitBreakerV2 {
         self.failure_history.write().await.clear();
         *self.consecutive_successes.write().await = 0;
         *self.open_since.write().await = None;
-        info!("🔄 Circuit Breaker ({}) resetado para Closed", self.component);
+        info!(
+            "🔄 Circuit Breaker ({}) resetado para Closed",
+            self.component
+        );
     }
 }
 

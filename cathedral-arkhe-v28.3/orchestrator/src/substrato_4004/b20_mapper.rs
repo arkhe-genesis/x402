@@ -1,7 +1,7 @@
 //! src/substrato_4004/b20_mapper.rs
 //! Mapeia Actions do Cathedral para operações B20
 
-use ethers::types::{Address, U256, Bytes};
+use ethers::types::{Address, Bytes, U256};
 use serde::{Deserialize, Serialize};
 
 /// Operação B20 mapeada a partir de uma Cathedral Action
@@ -68,8 +68,8 @@ pub enum PolicyScope {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum BurnType {
-    Caller,      // burn próprio
-    Blocked,     // burnBlocked (freeze-and-seize)
+    Caller,  // burn próprio
+    Blocked, // burnBlocked (freeze-and-seize)
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -103,11 +103,16 @@ impl B20TokenMapper {
                 let memo = extract_optional_memo(action)?;
 
                 // Verifica políticas
-                let sender_policy = self.policy_registry
+                let sender_policy = self
+                    .policy_registry
                     .get_policy(token, PolicyScope::TransferSender)
                     .await?;
 
-                if !self.policy_registry.is_authorized(sender_policy, from).await? {
+                if !self
+                    .policy_registry
+                    .is_authorized(sender_policy, from)
+                    .await?
+                {
                     return Err(MapperError::PolicyDenied("sender".to_string()));
                 }
 
@@ -134,7 +139,12 @@ impl B20TokenMapper {
                     return Err(MapperError::SupplyCapExceeded);
                 }
 
-                Ok(B20Operation::Mint { token, to, amount, memo })
+                Ok(B20Operation::Mint {
+                    token,
+                    to,
+                    amount,
+                    memo,
+                })
             }
             "freeze_and_seize" => {
                 let token = extract_address(action, "token")?;
@@ -142,11 +152,16 @@ impl B20TokenMapper {
                 let amount = extract_u256(action, "amount")?;
 
                 // Verifica se target está em blocklist
-                let sender_policy = self.policy_registry
+                let sender_policy = self
+                    .policy_registry
                     .get_policy(token, PolicyScope::TransferSender)
                     .await?;
 
-                if self.policy_registry.is_authorized(sender_policy, target).await? {
+                if self
+                    .policy_registry
+                    .is_authorized(sender_policy, target)
+                    .await?
+                {
                     return Err(MapperError::NotBlocked(target));
                 }
 
@@ -163,27 +178,44 @@ impl B20TokenMapper {
                 let scope = extract_policy_scope(action)?;
                 let policy_id = extract_u64(action, "policy_id")?;
 
-                Ok(B20Operation::UpdatePolicy { token, scope, policy_id })
+                Ok(B20Operation::UpdatePolicy {
+                    token,
+                    scope,
+                    policy_id,
+                })
             }
             "pause_b20" => {
                 let token = extract_address(action, "token")?;
                 let features = extract_pausable_features(action)?;
 
-                Ok(B20Operation::Pause { token, features, pause: true })
+                Ok(B20Operation::Pause {
+                    token,
+                    features,
+                    pause: true,
+                })
             }
             "unpause_b20" => {
                 let token = extract_address(action, "token")?;
                 let features = extract_pausable_features(action)?;
 
-                Ok(B20Operation::Pause { token, features, pause: false })
+                Ok(B20Operation::Pause {
+                    token,
+                    features,
+                    pause: false,
+                })
             }
             "update_multiplier" => {
                 let token = extract_address(action, "token")?;
                 let multiplier = extract_u256(action, "multiplier")?;
 
-                Ok(B20Operation::UpdateMultiplier { token, new_multiplier: multiplier })
+                Ok(B20Operation::UpdateMultiplier {
+                    token,
+                    new_multiplier: multiplier,
+                })
             }
-            _ => Err(MapperError::UnsupportedActionType(action.action_type.clone())),
+            _ => Err(MapperError::UnsupportedActionType(
+                action.action_type.clone(),
+            )),
         }
     }
 }

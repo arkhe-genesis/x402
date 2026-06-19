@@ -40,41 +40,72 @@ impl ComplianceEngine {
             policy,
             pause,
             role,
-            overall: ethical.is_passed() && policy.is_passed() && pause.is_passed() && role.is_passed(),
+            overall: ethical.is_passed()
+                && policy.is_passed()
+                && pause.is_passed()
+                && role.is_passed(),
         };
 
         // Emite evento de compliance
-        self.event_store.emit(OrchestratorEvent::ComplianceChecked {
-            action_id: action.id.clone(),
-            verdict: verdict.clone(),
-            timestamp: chrono::Utc::now().timestamp(),
-        }).await?;
+        self.event_store
+            .emit(OrchestratorEvent::ComplianceChecked {
+                action_id: action.id.clone(),
+                verdict: verdict.clone(),
+                timestamp: chrono::Utc::now().timestamp(),
+            })
+            .await?;
 
         Ok(verdict)
     }
 
     async fn check_policies(&self, op: &B20Operation) -> Result<PolicyCompliance, ComplianceError> {
         match op {
-            B20Operation::Transfer { token, from, to, .. } => {
-                let sender_policy = self.policy_registry.get_policy(*token, PolicyScope::TransferSender).await?;
-                let receiver_policy = self.policy_registry.get_policy(*token, PolicyScope::TransferReceiver).await?;
+            B20Operation::Transfer {
+                token, from, to, ..
+            } => {
+                let sender_policy = self
+                    .policy_registry
+                    .get_policy(*token, PolicyScope::TransferSender)
+                    .await?;
+                let receiver_policy = self
+                    .policy_registry
+                    .get_policy(*token, PolicyScope::TransferReceiver)
+                    .await?;
 
-                let sender_ok = self.policy_registry.is_authorized(sender_policy, *from).await?;
-                let receiver_ok = self.policy_registry.is_authorized(receiver_policy, *to).await?;
+                let sender_ok = self
+                    .policy_registry
+                    .is_authorized(sender_policy, *from)
+                    .await?;
+                let receiver_ok = self
+                    .policy_registry
+                    .is_authorized(receiver_policy, *to)
+                    .await?;
 
                 if !sender_ok {
-                    return Ok(PolicyCompliance::Denied(format!("sender {} blocked by policy {}", from, sender_policy)));
+                    return Ok(PolicyCompliance::Denied(format!(
+                        "sender {} blocked by policy {}",
+                        from, sender_policy
+                    )));
                 }
                 if !receiver_ok {
-                    return Ok(PolicyCompliance::Denied(format!("receiver {} blocked by policy {}", to, receiver_policy)));
+                    return Ok(PolicyCompliance::Denied(format!(
+                        "receiver {} blocked by policy {}",
+                        to, receiver_policy
+                    )));
                 }
 
                 Ok(PolicyCompliance::Passed)
             }
             B20Operation::Mint { token, to, .. } => {
-                let policy = self.policy_registry.get_policy(*token, PolicyScope::MintReceiver).await?;
+                let policy = self
+                    .policy_registry
+                    .get_policy(*token, PolicyScope::MintReceiver)
+                    .await?;
                 if !self.policy_registry.is_authorized(policy, *to).await? {
-                    return Ok(PolicyCompliance::Denied(format!("mint receiver {} blocked", to)));
+                    return Ok(PolicyCompliance::Denied(format!(
+                        "mint receiver {} blocked",
+                        to
+                    )));
                 }
                 Ok(PolicyCompliance::Passed)
             }
@@ -82,7 +113,10 @@ impl ComplianceEngine {
         }
     }
 
-    async fn check_pause_state(&self, op: &B20Operation) -> Result<PauseCompliance, ComplianceError> {
+    async fn check_pause_state(
+        &self,
+        op: &B20Operation,
+    ) -> Result<PauseCompliance, ComplianceError> {
         let token = match op {
             B20Operation::Transfer { token, .. } => *token,
             B20Operation::Mint { token, .. } => *token,
@@ -107,11 +141,21 @@ impl ComplianceEngine {
         Ok(PauseCompliance::Passed)
     }
 
-    async fn check_roles(&self, op: &B20Operation, action: &Action) -> Result<RoleCompliance, ComplianceError> {
+    async fn check_roles(
+        &self,
+        op: &B20Operation,
+        action: &Action,
+    ) -> Result<RoleCompliance, ComplianceError> {
         let required_role = match op {
             B20Operation::Mint { .. } => B20Constants::MINT_ROLE,
-            B20Operation::Burn { burn_type: BurnType::Caller, .. } => B20Constants::BURN_ROLE,
-            B20Operation::Burn { burn_type: BurnType::Blocked, .. } => B20Constants::BURN_BLOCKED_ROLE,
+            B20Operation::Burn {
+                burn_type: BurnType::Caller,
+                ..
+            } => B20Constants::BURN_ROLE,
+            B20Operation::Burn {
+                burn_type: BurnType::Blocked,
+                ..
+            } => B20Constants::BURN_BLOCKED_ROLE,
             B20Operation::Pause { pause: true, .. } => B20Constants::PAUSE_ROLE,
             B20Operation::Pause { pause: false, .. } => B20Constants::UNPAUSE_ROLE,
             B20Operation::UpdateMultiplier { .. } => B20Constants::OPERATOR_ROLE,
