@@ -3,14 +3,15 @@
 # Adaptador para MS Project e Primavera
 import hashlib
 import xml.etree.ElementTree as ET
-from typing import Dict, List, Optional
 from dataclasses import dataclass
 from enum import Enum
+
 
 class ProjectStatus(Enum):
     ON_TRACK = "CANONIZED_CLEAN"
     AT_RISK = "CANONIZED_PROVISIONAL"
     OFF_TRACK = "PROPOSED"
+
 
 @dataclass
 class ProjectTask:
@@ -19,34 +20,36 @@ class ProjectTask:
     start: str
     finish: str
     percent_complete: int
-    predecessors: List[int]
-    successors: List[int]
+    predecessors: list[int]
+    successors: list[int]
+
 
 class ProjectOrchestrationAdapter:
     """
     Ponte entre MS Project/Primavera e ARKHE OS.
     Converte cronogramas em Substratos e aplica o Ghost Threshold ao progresso.
     """
-    def __init__(self):
-        self.tasks: Dict[int, ProjectTask] = {}
-        self.critical_path: List[int] = []
 
-    def parse_msproject_xml(self, xml_path: str) -> List[Dict]:
+    def __init__(self):
+        self.tasks: dict[int, ProjectTask] = {}
+        self.critical_path: list[int] = []
+
+    def parse_msproject_xml(self, xml_path: str) -> list[dict]:
         """Parseia um arquivo MSPDI (XML) do Microsoft Project."""
         tree = ET.parse(xml_path)
         root = tree.getroot()
-        ns = {'p': 'http://schemas.microsoft.com/project'}
+        ns = {"p": "http://schemas.microsoft.com/project"}
 
         tasks = []
-        for task_elem in root.findall('.//p:Task', ns):
-            uid = int(task_elem.find('p:UID', ns).text)
-            name = task_elem.find('p:Name', ns).text or ""
-            start = task_elem.find('p:Start', ns).text or ""
-            finish = task_elem.find('p:Finish', ns).text or ""
-            pct = int(task_elem.find('p:PercentComplete', ns).text or "0")
+        for task_elem in root.findall(".//p:Task", ns):
+            uid = int(task_elem.find("p:UID", ns).text)
+            name = task_elem.find("p:Name", ns).text or ""
+            start = task_elem.find("p:Start", ns).text or ""
+            finish = task_elem.find("p:Finish", ns).text or ""
+            pct = int(task_elem.find("p:PercentComplete", ns).text or "0")
 
             predecessors = []
-            for pred in task_elem.findall('.//p:PredecessorLink/p:PredecessorUID', ns):
+            for pred in task_elem.findall(".//p:PredecessorLink/p:PredecessorUID", ns):
                 predecessors.append(int(pred.text))
 
             task = ProjectTask(uid, name, start, finish, pct, predecessors, [])
@@ -61,7 +64,7 @@ class ProjectOrchestrationAdapter:
 
         return [self._task_to_arkhe(t) for t in tasks]
 
-    def _task_to_arkhe(self, task: ProjectTask) -> Dict:
+    def _task_to_arkhe(self, task: ProjectTask) -> dict:
         """Converte uma tarefa em um substrato ARKHE."""
         # Mapear percentual de conclusão para Φ_C
         phi_c = task.percent_complete / 100.0
@@ -101,13 +104,13 @@ Status: {status.value}
             "seal": seal,
         }
 
-    def compute_critical_path(self) -> List[int]:
+    def compute_critical_path(self) -> list[int]:
         """Calcula o caminho crítico (simplificado: maior duração)."""
         # Implementação simplificada: usar algoritmo de caminho mais longo
         # Em produção, integrar com a engine de scheduling do MS Project
         return self.critical_path
 
-    def generate_portfolio_decree(self, task_results: List[Dict]) -> str:
+    def generate_portfolio_decree(self, task_results: list[dict]) -> str:
         """Gera um decreto consolidado do portfólio."""
         phi_values = [t["phi_c"] for t in task_results]
         avg_phi = sum(phi_values) / len(phi_values) if phi_values else 0.0
@@ -132,6 +135,7 @@ Tarefas Fora do Rumo (abaixo do Ghost Threshold γ=0.577):
 <|SEAL|> {hashlib.sha3_256(str(task_results).encode()).hexdigest()[:16]}
 <|ARKHE_END|>"""
         return decree
+
 
 # Exemplo de uso
 if __name__ == "__main__":

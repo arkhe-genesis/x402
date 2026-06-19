@@ -6,16 +6,19 @@
 ╚══════════════════════════════════════════════════════════════════════════════╝
 """
 
-import time
 import random
-from typing import Dict, List, Optional, Callable, Any
+import time
+from collections.abc import Callable
 from dataclasses import dataclass
 from enum import Enum
+from typing import Any
+
 
 class CircuitState(Enum):
-    CLOSED = "closed"      # Normal operation
-    OPEN = "open"          # Failing, reject requests
+    CLOSED = "closed"  # Normal operation
+    OPEN = "open"  # Failing, reject requests
     HALF_OPEN = "half_open"  # Testing if service recovered
+
 
 @dataclass
 class CircuitBreaker:
@@ -60,11 +63,17 @@ class CircuitBreaker:
         if self.failure_count >= self.failure_threshold:
             self.state = CircuitState.OPEN
 
+
 class RetryPolicy:
     """Política de retry com backoff exponencial."""
 
-    def __init__(self, max_retries: int = 3, base_delay: float = 1.0,
-                 max_delay: float = 60.0, exponential_base: float = 2.0):
+    def __init__(
+        self,
+        max_retries: int = 3,
+        base_delay: float = 1.0,
+        max_delay: float = 60.0,
+        exponential_base: float = 2.0,
+    ):
         self.max_retries = max_retries
         self.base_delay = base_delay
         self.max_delay = max_delay
@@ -79,16 +88,14 @@ class RetryPolicy:
             except Exception as e:
                 last_exception = e
                 if attempt < self.max_retries:
-                    delay = min(
-                        self.base_delay * (self.exponential_base ** attempt),
-                        self.max_delay
-                    )
+                    delay = min(self.base_delay * (self.exponential_base**attempt), self.max_delay)
                     # Add jitter
                     delay *= random.uniform(0.5, 1.5)
                     print(f"[Retry] Attempt {attempt + 1} failed, retrying in {delay:.2f}s")
                     time.sleep(delay)
 
         raise last_exception
+
 
 class BackpressureController:
     """Controlador de backpressure."""
@@ -115,23 +122,21 @@ class BackpressureController:
     def load_factor(self) -> float:
         return self.current_queue_size / self.max_queue_size
 
+
 class DisasterRecovery:
     """Sistema de Disaster Recovery com RPO/RTO."""
 
     def __init__(self, rpo_seconds: float = 300, rto_seconds: float = 600):
         self.rpo = rpo_seconds  # Recovery Point Objective
         self.rto = rto_seconds  # Recovery Time Objective
-        self.snapshots: List[Dict] = []
+        self.snapshots: list[dict] = []
         self.last_snapshot_time = 0.0
 
-    def snapshot(self, data: Dict):
-        self.snapshots.append({
-            "timestamp": time.time(),
-            "data": data.copy()
-        })
+    def snapshot(self, data: dict):
+        self.snapshots.append({"timestamp": time.time(), "data": data.copy()})
         self.last_snapshot_time = time.time()
 
-    def recover(self, target_time: float = None) -> Optional[Dict]:
+    def recover(self, target_time: float = None) -> dict | None:
         if not self.snapshots:
             return None
 
@@ -149,26 +154,25 @@ class DisasterRecovery:
     def meets_rpo(self) -> bool:
         return time.time() - self.last_snapshot_time <= self.rpo
 
+
 class HighAvailabilityCluster:
     """Cluster de alta disponibilidade."""
 
-    def __init__(self, nodes: List[str]):
+    def __init__(self, nodes: list[str]):
         self.nodes = nodes
         self.active_nodes = set(nodes)
-        self.failover_history: List[Dict] = []
+        self.failover_history: list[dict] = []
 
     def health_check(self):
         """Simula health checks e remove nós falhos."""
         for node in list(self.active_nodes):
             if random.random() < 0.05:  # 5% failure rate
                 self.active_nodes.remove(node)
-                self.failover_history.append({
-                    "node": node,
-                    "action": "removed",
-                    "timestamp": time.time()
-                })
+                self.failover_history.append(
+                    {"node": node, "action": "removed", "timestamp": time.time()}
+                )
 
-    def get_active_node(self) -> Optional[str]:
+    def get_active_node(self) -> str | None:
         if not self.active_nodes:
             return None
         return random.choice(list(self.active_nodes))
@@ -176,6 +180,7 @@ class HighAvailabilityCluster:
     @property
     def availability(self) -> float:
         return len(self.active_nodes) / len(self.nodes)
+
 
 if __name__ == "__main__":
     # Test Circuit Breaker
@@ -189,26 +194,30 @@ if __name__ == "__main__":
     for i in range(10):
         try:
             result = cb.call(flaky_service)
-            print(f"[CB] Call {i+1}: {result} (state: {cb.state.value})")
+            print(f"[CB] Call {i + 1}: {result} (state: {cb.state.value})")
         except Exception as e:
-            print(f"[CB] Call {i+1}: {e} (state: {cb.state.value})")
+            print(f"[CB] Call {i + 1}: {e} (state: {cb.state.value})")
 
     # Test Retry
     retry = RetryPolicy(max_retries=3)
     try:
         result = retry.execute(flaky_service)
         print(f"[Retry] Success: {result}")
-    except:
+    except Exception:
         print("[Retry] All retries exhausted")
 
     # Test Backpressure
     bp = BackpressureController(max_queue_size=10)
     for i in range(15):
         admitted = bp.admit()
-        print(f"[Backpressure] Request {i+1}: {'admitted' if admitted else 'rejected'} (load: {bp.load_factor:.1%})")
+        print(
+            f"[Backpressure] Request {i + 1}: {'admitted' if admitted else 'rejected'} (load: {bp.load_factor:.1%})"
+        )
 
     # Test HA Cluster
     ha = HighAvailabilityCluster(["node-1", "node-2", "node-3"])
     for _ in range(5):
         ha.health_check()
-        print(f"[HA] Active: {len(ha.active_nodes)}/{len(ha.nodes)} | Availability: {ha.availability:.1%}")
+        print(
+            f"[HA] Active: {len(ha.active_nodes)}/{len(ha.nodes)} | Availability: {ha.availability:.1%}"
+        )

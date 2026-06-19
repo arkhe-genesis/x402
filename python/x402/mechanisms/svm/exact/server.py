@@ -3,6 +3,7 @@
 from collections.abc import Callable
 
 from x402.schemas import AssetAmount, Network, PaymentRequirements, Price, SupportedKind
+
 from ..constants import DEFAULT_DECIMALS, SCHEME_EXACT
 from ..utils import get_network_config, get_usdc_address, parse_money_to_decimal
 

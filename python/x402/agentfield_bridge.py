@@ -1,10 +1,14 @@
-import sys
-import os
 import asyncio
-from typing import Any, Callable, Dict, List, Optional
+import os
+import sys
+from collections.abc import Callable
+from typing import Any
 
 # Add orchestrator to path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../989y3-full-100t-orchestrator")))
+sys.path.insert(
+    0,
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "../../989y3-full-100t-orchestrator")),
+)
 
 try:
     from full_100t_orchestrator import Full100TOrchestrator, InferencePriority
@@ -12,6 +16,7 @@ except ImportError:
     # Handle mock for testing environments where the orchestrator might not be available
     Full100TOrchestrator = None
     InferencePriority = None
+
 
 class ArkheAgentFieldBridge:
     """
@@ -24,7 +29,7 @@ class ArkheAgentFieldBridge:
     - governance/DIDs -> Passport-Gateway (989.x) + Axiarchy (954).
     """
 
-    def __init__(self, node_id: str, version: str = "1.0.0", ai_config: Optional[Dict] = None):
+    def __init__(self, node_id: str, version: str = "1.0.0", ai_config: dict | None = None):
         self.node_id = node_id
         self.version = version
         self.ai_config = ai_config or {}
@@ -43,15 +48,17 @@ class ArkheAgentFieldBridge:
             await self.orchestrator.run(max_concurrent=8)
             self._orchestrator_started = True
 
-    def reasoner(self, tags: List[str] = None):
+    def reasoner(self, tags: list[str] = None):
         """
         AgentField-compatible @app.reasoner decorator.
         Maps to OmniAgent (939) conceptually.
         """
+
         def decorator(func: Callable):
             func._is_reasoner = True
             func._reasoner_tags = tags or []
             return func
+
         return decorator
 
     async def ai(self, system: str, user: str, schema: Any = None, **kwargs) -> Any:
@@ -72,7 +79,7 @@ class ArkheAgentFieldBridge:
                 prompt=prompt,
                 task_type="reasoning",
                 priority=InferencePriority.HIGH,
-                model_id=model_id
+                model_id=model_id,
             )
 
             # Wait for completion (poll for simplicity in this bridge)
@@ -83,17 +90,19 @@ class ArkheAgentFieldBridge:
                 "result": job.result,
                 "model_id": job.model_id,
                 "job_id": job.job_id,
-                "seal": job.seal
+                "seal": job.seal,
             }
         else:
             return {
                 "result": "Orchestrator not available.",
                 "model_id": "mock",
                 "job_id": "mock-123",
-                "seal": "MOCK-SEAL"
+                "seal": "MOCK-SEAL",
             }
 
-    async def pause(self, approval_request_id: str, approval_request_url: str, expires_in_hours: int = 48):
+    async def pause(
+        self, approval_request_id: str, approval_request_url: str, expires_in_hours: int = 48
+    ):
         """
         AgentField-compatible Human-in-the-Loop app.pause method.
         """
@@ -101,7 +110,7 @@ class ArkheAgentFieldBridge:
         print(f"Agent {self.node_id} pausing for approval via {approval_request_url}")
         return True
 
-    async def call(self, agent_func: str, input: Dict):
+    async def call(self, agent_func: str, input: dict):
         """
         AgentField-compatible cross-agent call.
         """
@@ -111,6 +120,7 @@ class ArkheAgentFieldBridge:
 
 class _BinduMemoryBridge:
     """Mock for shared memory -> Bindu (952)"""
+
     def __init__(self):
         self._store = {}
 
@@ -126,6 +136,7 @@ class _BinduMemoryBridge:
 
 class _AxiarchyGovernanceBridge:
     """Mock for governance/DIDs -> Passport-Gateway (989.x) + Axiarchy (954)"""
+
     def __init__(self):
         pass
 

@@ -6,21 +6,22 @@
 ╚══════════════════════════════════════════════════════════════════════════════╝
 """
 
-import time
 import random
-from typing import Dict, List, Optional, Any
-from dataclasses import dataclass, field
+import time
 from collections import defaultdict, deque
-from datetime import datetime
+from dataclasses import dataclass, field
+from typing import Any
+
 
 @dataclass
 class LogEntry:
     timestamp: float
     level: str
     message: str
-    context: Dict[str, Any] = field(default_factory=dict)
-    trace_id: Optional[str] = None
-    span_id: Optional[str] = None
+    context: dict[str, Any] = field(default_factory=dict)
+    trace_id: str | None = None
+    span_id: str | None = None
+
 
 class StructuredLogger:
     """Logger estruturado com níveis e contexto."""
@@ -38,17 +39,24 @@ class StructuredLogger:
                 timestamp=time.time(),
                 level=level,
                 message=message,
-                context={"service": self.service, **context}
+                context={"service": self.service, **context},
             )
             self.logs.append(entry)
             print(f"[{level}] {self.service}: {message}")
 
-    def debug(self, msg: str, **ctx): self.log("DEBUG", msg, **ctx)
-    def info(self, msg: str, **ctx): self.log("INFO", msg, **ctx)
-    def warn(self, msg: str, **ctx): self.log("WARN", msg, **ctx)
-    def error(self, msg: str, **ctx): self.log("ERROR", msg, **ctx)
+    def debug(self, msg: str, **ctx):
+        self.log("DEBUG", msg, **ctx)
 
-    def query(self, level: str = None, time_range: tuple = None) -> List[LogEntry]:
+    def info(self, msg: str, **ctx):
+        self.log("INFO", msg, **ctx)
+
+    def warn(self, msg: str, **ctx):
+        self.log("WARN", msg, **ctx)
+
+    def error(self, msg: str, **ctx):
+        self.log("ERROR", msg, **ctx)
+
+    def query(self, level: str = None, time_range: tuple = None) -> list[LogEntry]:
         results = list(self.logs)
         if level:
             results = [e for e in results if e.level == level]
@@ -56,20 +64,22 @@ class StructuredLogger:
             results = [e for e in results if time_range[0] <= e.timestamp <= time_range[1]]
         return results
 
+
 @dataclass
 class Metric:
     name: str
     value: float
     timestamp: float
-    labels: Dict[str, str] = field(default_factory=dict)
+    labels: dict[str, str] = field(default_factory=dict)
+
 
 class MetricsCollector:
     """Coletor de métricas com agregação."""
 
     def __init__(self):
-        self.metrics: Dict[str, List[Metric]] = defaultdict(list)
-        self.gauges: Dict[str, float] = {}
-        self.counters: Dict[str, float] = defaultdict(float)
+        self.metrics: dict[str, list[Metric]] = defaultdict(list)
+        self.gauges: dict[str, float] = {}
+        self.counters: dict[str, float] = defaultdict(float)
 
     def record(self, name: str, value: float, **labels):
         metric = Metric(name, value, time.time(), labels)
@@ -81,7 +91,7 @@ class MetricsCollector:
     def counter(self, name: str, delta: float = 1.0):
         self.counters[name] += delta
 
-    def aggregate(self, name: str, window_seconds: float = 60.0) -> Dict:
+    def aggregate(self, name: str, window_seconds: float = 60.0) -> dict:
         now = time.time()
         recent = [m for m in self.metrics[name] if now - m.timestamp <= window_seconds]
 
@@ -95,15 +105,16 @@ class MetricsCollector:
             "avg": sum(values) / len(values),
             "min": min(values),
             "max": max(values),
-            "p95": sorted(values)[int(len(values) * 0.95)] if len(values) > 20 else max(values)
+            "p95": sorted(values)[int(len(values) * 0.95)] if len(values) > 20 else max(values),
         }
+
 
 class DistributedTracer:
     """Tracer distribuído com spans e trace context."""
 
     def __init__(self):
-        self.traces: Dict[str, List[Dict]] = {}
-        self.current_trace: Optional[str] = None
+        self.traces: dict[str, list[dict]] = {}
+        self.current_trace: str | None = None
 
     def start_trace(self, name: str) -> str:
         trace_id = f"trace-{random.randint(100000, 999999)}"
@@ -119,7 +130,7 @@ class DistributedTracer:
             "parent_id": parent_id,
             "start_time": time.time(),
             "end_time": None,
-            "tags": {}
+            "tags": {},
         }
         self.traces[self.current_trace].append(span)
         return span["id"]
@@ -130,7 +141,7 @@ class DistributedTracer:
                 span["end_time"] = time.time()
                 break
 
-    def get_trace(self, trace_id: str) -> List[Dict]:
+    def get_trace(self, trace_id: str) -> list[dict]:
         return self.traces.get(trace_id, [])
 
     def get_trace_duration(self, trace_id: str) -> float:
@@ -143,26 +154,30 @@ class DistributedTracer:
             return max(ends) - min(starts)
         return 0.0
 
+
 class AlertManager:
     """Gerenciador de alertas com thresholds."""
 
     def __init__(self):
-        self.rules: List[Dict] = []
+        self.rules: list[dict] = []
         self.alerts: deque = deque(maxlen=1000)
         self.alert_count = defaultdict(int)
 
-    def add_rule(self, name: str, metric: str, threshold: float,
-                 operator: str = ">", duration: float = 60.0):
-        self.rules.append({
-            "name": name,
-            "metric": metric,
-            "threshold": threshold,
-            "operator": operator,
-            "duration": duration,
-            "triggered_at": None
-        })
+    def add_rule(
+        self, name: str, metric: str, threshold: float, operator: str = ">", duration: float = 60.0
+    ):
+        self.rules.append(
+            {
+                "name": name,
+                "metric": metric,
+                "threshold": threshold,
+                "operator": operator,
+                "duration": duration,
+                "triggered_at": None,
+            }
+        )
 
-    def evaluate(self, metrics: Dict[str, float]):
+    def evaluate(self, metrics: dict[str, float]):
         for rule in self.rules:
             value = metrics.get(rule["metric"])
             if value is None:
@@ -182,39 +197,39 @@ class AlertManager:
             else:
                 rule["triggered_at"] = None
 
-    def _fire_alert(self, rule: Dict, value: float):
+    def _fire_alert(self, rule: dict, value: float):
         alert = {
             "rule": rule["name"],
             "metric": rule["metric"],
             "value": value,
             "threshold": rule["threshold"],
-            "timestamp": time.time()
+            "timestamp": time.time(),
         }
         self.alerts.append(alert)
         self.alert_count[rule["name"]] += 1
-        print(f"[ALERT] {rule['name']}: {rule['metric']}={value:.2f} (threshold: {rule['threshold']})")
+        print(
+            f"[ALERT] {rule['name']}: {rule['metric']}={value:.2f} (threshold: {rule['threshold']})"
+        )
+
 
 class SLAManager:
     """Gerenciador de SLA/SLO/SLI."""
 
     def __init__(self):
-        self.slas: Dict[str, Dict] = {}
-        self.slis: Dict[str, List[float]] = defaultdict(list)
+        self.slas: dict[str, dict] = {}
+        self.slis: dict[str, list[float]] = defaultdict(list)
 
-    def define_sla(self, service: str, slo: Dict):
+    def define_sla(self, service: str, slo: dict):
         """
         Define SLOs para um serviço.
         Ex: {"availability": 0.999, "latency_p95": 0.2, "error_rate": 0.001}
         """
-        self.slas[service] = {
-            "slo": slo,
-            "breaches": []
-        }
+        self.slas[service] = {"slo": slo, "breaches": []}
 
     def record_sli(self, service: str, metric: str, value: float):
         self.slis[f"{service}.{metric}"].append(value)
 
-    def check_compliance(self, service: str) -> Dict:
+    def check_compliance(self, service: str) -> dict:
         if service not in self.slas:
             return {"error": "SLA not defined"}
 
@@ -226,13 +241,10 @@ class SLAManager:
             if values:
                 actual = sum(values) / len(values)
                 compliant = actual >= target if metric != "error_rate" else actual <= target
-                results[metric] = {
-                    "target": target,
-                    "actual": actual,
-                    "compliant": compliant
-                }
+                results[metric] = {"target": target, "actual": actual, "compliant": compliant}
 
         return results
+
 
 class ObservabilityPlatform:
     """Plataforma unificada de observabilidade."""
@@ -246,6 +258,7 @@ class ObservabilityPlatform:
 
     def instrument(self, func):
         """Decorator para instrumentação automática."""
+
         def wrapper(*args, **kwargs):
             trace_id = self.tracer.start_trace(func.__name__)
             start = time.time()
@@ -262,7 +275,9 @@ class ObservabilityPlatform:
                 duration = time.time() - start
                 self.metrics.record("request.duration", duration)
                 self.tracer.end_span(self.tracer.traces[trace_id][0]["id"])
+
         return wrapper
+
 
 if __name__ == "__main__":
     obs = ObservabilityPlatform("arkhe-gateway")
