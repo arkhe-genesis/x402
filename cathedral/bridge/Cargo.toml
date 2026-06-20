@@ -9,5 +9,11 @@ prost = "0.13"
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 prost-types = "0.13"
 
+common = { path = "../../common" }
+cathedral-sdk = { path = "../sdk-rs" }
+anyhow = "1.0"
+blake3 = "1.0"
+tracing = "0.1"
+
 [build-dependencies]
 tonic-build = "0.12"

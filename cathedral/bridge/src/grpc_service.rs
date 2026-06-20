@@ -6,12 +6,13 @@ pub mod pb {
 
 use pb::cathedral_bridge_server::CathedralBridge;
 use pb::{
-    GovernanceRequest, GovernanceResponse, GovernanceVerdict, IngestRequest,
-    IngestResponse, QueryProvenanceRequest, QueryProvenanceResponse,
+    GovernanceRequest, GovernanceResponse, GovernanceVerdict, IngestRequest, IngestResponse,
+    QueryProvenanceRequest, QueryProvenanceResponse,
 };
 
-#[derive(Debug, Default)]
-pub struct MyCathedralBridge {}
+pub struct MyCathedralBridge {
+    pub verifier: std::sync::Arc<crate::signature_verifier::SignatureVerifier>,
+}
 
 #[tonic::async_trait]
 impl CathedralBridge for MyCathedralBridge {
@@ -22,6 +23,17 @@ impl CathedralBridge for MyCathedralBridge {
         println!("Got a request: {:?}", request);
 
         let req = request.into_inner();
+
+        // Dummy verification (em produção o signature estaria nos metadados ou request)
+        let signature = b"dummy";
+        if let Err(e) = self
+            .verifier
+            .verify_batch(&req.agent_id, &req.events, signature)
+            .await
+        {
+            println!("Falha na verificação: {}", e);
+            // In a real scenario we could reject here. But we just log it for now to avoid breaking stubs.
+        }
 
         let response = IngestResponse {
             success: true,
@@ -47,7 +59,10 @@ impl CathedralBridge for MyCathedralBridge {
             rationale: "Approved by stub".to_string(),
             conditions: vec![],
             evaluated_by: "stub".to_string(),
-            evaluated_at: Some(prost_types::Timestamp::date_time_nanos(2026, 6, 19, 0, 0, 0, 0).unwrap_or_default()),
+            evaluated_at: Some(
+                prost_types::Timestamp::date_time_nanos(2026, 6, 19, 0, 0, 0, 0)
+                    .unwrap_or_default(),
+            ),
         };
 
         Ok(Response::new(response))

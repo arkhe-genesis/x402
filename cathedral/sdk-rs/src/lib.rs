@@ -1,3 +1,4 @@
+pub mod crypto;
 pub mod grpc;
 
 use anyhow::{anyhow, bail, Result};
@@ -48,6 +49,9 @@ pub struct GovernanceResponse {
 
 #[derive(Debug, Clone)]
 pub struct SdkConfig {
+    pub crypto: common::crypto_config::CryptoConfig,
+    pub private_key_bytes: Option<Vec<u8>>,
+    pub fallback_private_key_bytes: Option<Vec<u8>>,
     pub bridge_endpoint: String,
     pub project_id: String,
     pub agent_id: String,
@@ -67,6 +71,9 @@ impl Default for SdkConfig {
     fn default() -> Self {
         Self {
             bridge_endpoint: "http://localhost:50051".to_string(),
+            crypto: common::crypto_config::CryptoConfig::default(),
+            private_key_bytes: None,
+            fallback_private_key_bytes: None,
             project_id: "default".to_string(),
             agent_id: "default-agent".to_string(),
             batch_size: 50,
@@ -81,6 +88,8 @@ impl Default for SdkConfig {
 // ============================================================
 
 pub struct CathedralSdk {
+    signing_key: crypto::SigningKeyWrapper,
+    fallback_key: Option<crypto::SigningKeyWrapper>,
     config: SdkConfig,
     event_tx: mpsc::UnboundedSender<SdkEvent>,
     grpc_client: grpc::GrpcClient,
@@ -97,6 +106,32 @@ impl CathedralSdk {
         let (tx, mut rx) = mpsc::unbounded_channel();
 
         let mut grpc_client = grpc::GrpcClient::new(config.bridge_endpoint.clone()).await?;
+
+        let crypto_config = config.crypto.clone();
+        let factory = crypto::CryptoFactory::new(crypto_config.clone());
+
+        let signing_key = if let Some(ref bytes) = config.private_key_bytes {
+            crypto::SigningKeyWrapper::from_bytes(crypto_config.signature_algorithm, bytes)?
+        } else {
+            factory.generate_signing_key()?
+        };
+
+        let fallback_key = if crypto_config.dual_stack_mode {
+            if let Some(fallback_alg) = crypto_config.fallback_signature_algorithm {
+                if let Some(ref fallback_bytes) = config.fallback_private_key_bytes {
+                    Some(crypto::SigningKeyWrapper::from_bytes(
+                        fallback_alg,
+                        fallback_bytes,
+                    )?)
+                } else {
+                    factory.generate_fallback_key()?
+                }
+            } else {
+                None
+            }
+        } else {
+            None
+        };
 
         // Background task para flush em batch
         let config_clone = config.clone();
@@ -132,6 +167,8 @@ impl CathedralSdk {
                 events_emitted: 0,
                 events_batched: 0,
             },
+            signing_key,
+            fallback_key,
         })
     }
 
@@ -144,7 +181,14 @@ impl CathedralSdk {
             return;
         }
 
-        match client.ingest(config.project_id.clone(), config.agent_id.clone(), batch.clone()).await {
+        match client
+            .ingest(
+                config.project_id.clone(),
+                config.agent_id.clone(),
+                batch.clone(),
+            )
+            .await
+        {
             Ok(resp) if resp.success => {
                 debug!("✅ Batch of {} events sent successfully", batch.len());
             }
@@ -176,7 +220,8 @@ impl CathedralSdk {
             rationale,
             agent_id: self.config.agent_id.clone(),
         };
-        self.event_tx.send(event)
+        self.event_tx
+            .send(event)
             .map_err(|e| anyhow!("Failed to send event: {}", e))?;
         Ok(())
     }
@@ -196,7 +241,8 @@ impl CathedralSdk {
             convergence,
             compute_cost_usd,
         };
-        self.event_tx.send(event)
+        self.event_tx
+            .send(event)
             .map_err(|e| anyhow!("Failed to send event: {}", e))?;
         Ok(())
     }
@@ -211,7 +257,8 @@ impl CathedralSdk {
         }
 
         let risk = Self::estimate_risk(&event);
-        if self.config.governance_mode == GovernanceMode::AutonomousWithCircuitBreaker && risk < 0.5 {
+        if self.config.governance_mode == GovernanceMode::AutonomousWithCircuitBreaker && risk < 0.5
+        {
             return Ok(GovernanceResponse {
                 verdict: "approved".to_string(),
                 rationale: "Low risk decision".to_string(),
@@ -219,7 +266,13 @@ impl CathedralSdk {
             });
         }
 
-        self.grpc_client.request_governance(self.config.project_id.clone(), self.config.agent_id.clone(), event).await
+        self.grpc_client
+            .request_governance(
+                self.config.project_id.clone(),
+                self.config.agent_id.clone(),
+                event,
+            )
+            .await
     }
 
     fn estimate_risk(event: &SdkEvent) -> f64 {
