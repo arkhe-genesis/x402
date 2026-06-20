@@ -1,0 +1,16 @@
+[package]
+name = "benches"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+criterion = "0.5"
+cathedral-sdk = { path = "../cathedral/sdk-rs" }
+common = { path = "../common" }
+pqcrypto-dilithium = "0.3.1"
+pqcrypto-traits = "0.3.5"
+ed25519-dalek = { version = "2.1.1", features = ["rand_core"] }
+
+[[bench]]
+name = "pqc_benchmarks"
+harness = false
