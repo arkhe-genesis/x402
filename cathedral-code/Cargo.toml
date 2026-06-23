@@ -1,0 +1,17 @@
+[workspace]
+members = [
+    "crates/cathedral-core",
+    "crates/cathedral-identity",
+    "crates/cathedral-wormgraph",
+    "crates/cathedral-zk",
+    "crates/cathedral-remix-bridge",
+    "crates/cathedral-opencode-bridge",
+    "crates/cathedral-server",
+    "crates/cathedral-cli",
+    "crates/cathedral-harness",
+    "crates/cathedral-orchestration",
+    "crates/cathedral-tools",
+    "crates/cathedral-permissions",
+    "crates/cathedral-self-improve",
+]
+resolver = "2"
